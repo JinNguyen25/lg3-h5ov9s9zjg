@@ -234,8 +234,11 @@ function chapter(n,fb){
       var t=e.target.closest('[data-m]'); if(t){chapter.m=t.dataset.m;chapter(n);return}
       t=e.target.closest('[data-brq]'); if(t){var bi=+t.dataset.brq;startPractice(shuffle(qs.filter(function(q){return q.br===bi})),'Nhánh '+(bi+1)+': '+brName(n,bi),'#learn/'+n+'/'+bi);return}
       t=e.target.closest('[data-sub]'); if(t){var k=t.dataset.sub;
-        if(S.set.recall&&app.querySelector('[data-lf^="'+k+'-"]')){t.closest('.t-row').querySelectorAll('[data-lf]').forEach(function(x){REV[x.dataset.lf]=1})} else OPEN[k]=!OPEN[k];
-        var y=window.scrollY;chapter(n);window.scrollTo(0,y);var f=app.querySelector('[data-sub="'+k+'"]');if(f)f.focus({preventScroll:true});return}
+        /* chỉ mở một ô mỗi lúc: mở ô mới thì ô đang mở tự đóng lại */
+        if(S.set.recall&&app.querySelector('[data-lf^="'+k+'-"]')){t.closest('.t-row').querySelectorAll('[data-lf]').forEach(function(x){REV[x.dataset.lf]=1})} else {var wasOpen=OPEN[k];OPEN={};if(!wasOpen)OPEN[k]=1}
+        /* giữ ô vừa chạm đứng yên trên màn hình, kể cả khi ô phía trên vừa đóng lại */
+        var top0=t.getBoundingClientRect().top;chapter(n);var f=app.querySelector('[data-sub="'+k+'"]');
+        if(f){window.scrollBy(0,f.getBoundingClientRect().top-top0);f.focus({preventScroll:true})}return}
       t=e.target.closest('[data-lf]'); if(t){REV[t.dataset.lf]=1;var y3=window.scrollY;chapter(n);window.scrollTo(0,y3);return}
       t=e.target.closest('[data-go-b]'); if(t){var el=document.getElementById('br'+t.dataset.goB);if(el)el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});return}
       t=e.target.closest('[data-mm]'); if(t){var i=+t.dataset.mm,ok=t.dataset.v==='1';brMark(n+'-'+i,ok);if(ok)S.read[n+'-'+i]=1;else delete S.read[n+'-'+i];save();
