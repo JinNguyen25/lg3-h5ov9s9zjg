@@ -453,6 +453,7 @@ function stats(){
   h+='<div class="row" style="border-top:1px solid var(--line);padding-top:10px"><b class="grow">Tổng</b><span class="pct">'+pct(sum,50)+'%</span></div>'+meter(pct(sum,50),true)+'</div>';
   h+='<div class="btns" style="margin:10px 0"><button class="btn" data-act="diag">Kiểm tra đầu vào 20 câu</button>'+(due?'<button class="btn primary" data-act="due">Ôn '+Math.min(due,20)+' câu đến hạn</button>':'')+'</div>';
   h+='<details class="card muted"><summary><b>Cách tính cấp</b></summary><p>Cấp tính theo câu hỏi của từng chương, phải tự làm mới lên được, và tụt xuống nếu lúc ôn lại làm sai:</p><p>1 – đã làm ≥20% số câu · 2 – đang đúng ≥40% · 3 – đang đúng ≥70% · 4 – ≥70% số câu đang đúng và đã đúng ở ít nhất 2 ngày khác nhau · 5 – như cấp 4 nhưng ≥90%.</p><p>Ôn cách quãng: câu làm đúng sẽ quay lại sau 1, 3, 7, 14, 30 ngày; làm sai thì về đầu. Làm đúng nhiều lần trong cùng một buổi không làm câu lên hộp. Mục tiêu trước khi thi: mọi chương đạt cấp 4, rồi làm đề thi thử 40 câu.</p><p>Ý tưởng lấy từ skill socratic-tutor của Jane Street (MIT), chỉnh lại cho đề trắc nghiệm.</p></details>';
+  h+='<h2>Ứng dụng</h2><div class="card"><div class="row"><div class="grow"><b>'+(UPD.has?'Có bản mới':'Phiên bản')+'</b><div class="muted">Đang dùng: '+verName(UPD.cur)+(UPD.latest?' · Mới nhất: '+verName(UPD.latest):'')+'</div></div><button class="btn'+(UPD.has?' primary':'')+'" data-upd>Cập nhật</button></div><p class="muted" style="margin:8px 0 0">Bấm Cập nhật để tải bản mới nhất và mở lại app. Tiến độ học được giữ nguyên.</p></div>';
   h+='<h2>Sao lưu</h2><div class="card"><p class="muted">Tiến độ chỉ lưu trên trình duyệt của máy này. Muốn chuyển sang máy khác: xuất file ở máy cũ rồi nhập ở máy mới.</p><div class="btns"><button class="btn" data-act="exp">Xuất tiến độ</button><button class="btn" data-act="imp">Nhập tiến độ</button><button class="btn" data-act="reset">Xóa tiến độ</button></div></div>';
   h+='<h2>Nguồn dữ liệu</h2><div class="card muted">'+Q.filter(function(q){return q.src==='mock'}).length+' câu từ đề thi thử của khóa học RKU 2026 (file Excel đề + PDF 解答・解説 30/09/2026), '+Q.filter(function(q){return q.src==='extra'}).length+' câu tự soạn theo bài giảng 10 chương (標準テキスト 第4版対応). Giải thích tiếng Việt là bản viết lại; '+Q.filter(function(q){return q.warn}).length+' câu có ghi chú "Lưu ý nguồn" ở chỗ lời giải gốc đáng ngờ hoặc luật đã đổi. Đây là tài liệu ôn tập cá nhân, không phải đề chính thức của JAVADA.</div>';
   app.innerHTML=h;
@@ -473,6 +474,56 @@ $('#import-file').addEventListener('change',function(){
   r.readAsText(f);
 });
 
+
+/* ---------- Cập nhật ứng dụng ----------
+   Phiên bản = VERSION trong sw.js. Bản đang chạy hỏi service worker đang điều khiển trang;
+   bản mới nhất đọc thẳng sw.js trên máy chủ. Khác nhau thì hiện thanh "Có bản mới". */
+var UPD={cur:null,latest:null,has:false,busy:false};
+function verName(v){return v?v.replace(/^logi3-/,''):'—'}
+function askCur(){
+  if(!('serviceWorker' in navigator)||!navigator.serviceWorker.controller) return Promise.resolve(null);
+  return new Promise(function(res){
+    var t=setTimeout(function(){res(null)},1500);
+    navigator.serviceWorker.addEventListener('message',function f(e){if(e.data&&e.data.version){clearTimeout(t);navigator.serviceWorker.removeEventListener('message',f);res(e.data.version)}});
+    navigator.serviceWorker.controller.postMessage('version');
+  });
+}
+function askLatest(){
+  if(!navigator.onLine) return Promise.resolve(null);
+  return fetch('sw.js?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():''}).then(function(t){var m=t.match(/VERSION='([^']+)'/);return m?m[1]:null}).catch(function(){return null});
+}
+function checkUpdate(){
+  return Promise.all([UPD.cur?UPD.cur:askCur(),askLatest()]).then(function(v){
+    if(v[0])UPD.cur=v[0]; if(v[1])UPD.latest=v[1];
+    if(UPD.cur&&UPD.latest&&UPD.cur!==UPD.latest) UPD.has=true;
+    updBanner(); if(location.hash==='#stats') stats();
+  });
+}
+function updBanner(){var b=$('#upd');if(b)b.hidden=!UPD.has||UPD.busy}
+function doUpdate(){
+  if(!navigator.onLine){toast('Cần có mạng để cập nhật');return}
+  UPD.busy=true;updBanner();toast('Đang tải bản mới…');
+  var done=false;function go(){if(done)return;done=true;location.reload()}
+  if(!('serviceWorker' in navigator)){go();return}
+  navigator.serviceWorker.getRegistration().then(function(reg){
+    if(!reg) return;
+    navigator.serviceWorker.addEventListener('controllerchange',go);
+    return reg.update().then(function(){return new Promise(function(res){
+      var w=reg.installing||reg.waiting; if(!w) return res();
+      if(reg.waiting) reg.waiting.postMessage('skip');
+      w.addEventListener('statechange',function(){if(w.state==='activated'||w.state==='redundant')res()});
+      setTimeout(res,10000);
+    })});
+  }).catch(function(){}).then(function(){setTimeout(go,300)});
+}
+document.addEventListener('click',function(e){if(e.target.closest('[data-upd]'))doUpdate()});
+if('serviceWorker' in navigator){
+  /* service worker mới tự cài trong nền và giành quyền điều khiển → trang đang chạy là bản cũ */
+  var hadCtl=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange',function(){if(hadCtl&&!UPD.busy){UPD.has=true;updBanner()}hadCtl=true});
+}
+setTimeout(checkUpdate,1500);
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')checkUpdate()});
 /* ---------- Điều hướng ---------- */
 function route(){
   var h=location.hash.replace(/^#/,'')||'home', p=h.split('/');
