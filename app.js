@@ -112,6 +112,42 @@ function learn(){
   });
   app.innerHTML=h;app.onclick=null;
 }
+
+/* ---------- Từ điển: gạch chân từ chuyên ngành, chạm để xem nghĩa ----------
+   Nguồn: window.TERMS (thuật ngữ theo chương) + window.GLOSS (từ viết tắt, từ kanji bổ sung).
+   Mỗi đoạn văn chỉ gạch chân lần xuất hiện đầu tiên của một từ để đỡ rối mắt. */
+var GL=[],GLRE=null;
+(function(){
+  var seen={};
+  (window.TERMS||[]).forEach(function(t){if(!seen[t[0]]){seen[t[0]]=1;GL.push([t[0],t[1],t[2]])}});
+  (window.GLOSS||[]).forEach(function(t){if(!seen[t[0]]){seen[t[0]]=1;GL.push(t)}});
+  if(!GL.length) return;
+  var idx=GL.map(function(t,i){return i}).sort(function(a,b){return GL[b][0].length-GL[a][0].length});
+  var lat=/^[A-Za-z0-9\-\/\s]+$/;
+  var parts=idx.map(function(i){var w=esc(GL[i][0]).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');return lat.test(GL[i][0])?'(?<![A-Za-z0-9])'+w+'(?![A-Za-z0-9])':w});
+  try{GLRE=new RegExp(parts.join('|'),'g')}catch(e){GLRE=null}
+  GL.forEach(function(t,i){GL.map||0;GL[esc(t[0])]=i});
+})();
+/* nhận chuỗi ĐÃ escape, trả về HTML có gạch chân */
+function gl(html){
+  if(!GLRE) return html;
+  var used={};
+  return html.replace(GLRE,function(m){var i=GL[m];if(i==null||used[m])return m;used[m]=1;return '<button type="button" class="gl" data-g="'+i+'">'+m+'</button>'});
+}
+function glPop(btn){
+  var t=GL[+btn.dataset.g], pop=$('#glpop'); if(!t||!pop) return;
+  pop.innerHTML='<div class="gl-w" lang="ja">'+esc(t[0])+'</div>'+(t[1]?'<div class="gl-r" lang="ja">'+esc(t[1])+'</div>':'')+'<div class="gl-m">'+esc(t[2])+'</div>';
+  pop.hidden=false;
+  var r=btn.getBoundingClientRect(), w=Math.min(320,innerWidth-24), x=Math.max(12,Math.min(innerWidth-w-12,r.left+r.width/2-w/2));
+  pop.style.width=w+'px';pop.style.left=x+'px';
+  var h=pop.offsetHeight, below=r.bottom+8+h<innerHeight-70;
+  pop.style.top=(below?r.bottom+8:Math.max(8,r.top-h-8))+'px';
+  document.querySelectorAll('.gl.on').forEach(function(b){b.classList.remove('on')});btn.classList.add('on');
+}
+function glClose(){var p=$('#glpop');if(p&&!p.hidden){p.hidden=true;document.querySelectorAll('.gl.on').forEach(function(b){b.classList.remove('on')})}}
+document.addEventListener('click',function(e){var b=e.target.closest('.gl');if(b){e.stopPropagation();glPop(b);return}if(!e.target.closest('#glpop'))glClose()},true);
+window.addEventListener('scroll',glClose,{passive:true});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')glClose()});
 /* ---------- Sơ đồ tư duy ---------- */
 var OPEN={};   /* ý đang mở trong sơ đồ (chỉ trong phiên này) */
 function mmPos(i,n){var a=-Math.PI/2+i*2*Math.PI/n;return {x:Math.max(16,Math.min(84,50+36*Math.cos(a))),y:50+38*Math.sin(a)}}
@@ -139,7 +175,7 @@ function mindmap(n,cards){
       h+='<div class="t-row"><button class="t-sub'+(o?' open':'')+'" data-sub="'+k+'" aria-expanded="'+(o?'true':'false')+'" lang="ja">'+esc(ch[0])+'</button><div class="t-leaves">';
       ch[1].forEach(function(f,m){var rk=k+'-'+m, hid=rc&&!REV[rk];
         h+=hid?'<button class="t-leaf hid" data-lf="'+rk+'" aria-label="Chạm để xem">?</button>':'<span class="t-leaf" lang="ja">'+esc(f)+'</span>'});
-      h+='</div>'+(o?'<div class="t-detail"><div class="j" lang="ja">'+esc(pt[0])+'</div>'+(ex?'<div class="v">'+esc(ex)+'</div>':'')+'</div>':'')+'</div>';
+      h+='</div>'+(o?'<div class="t-detail"><div class="j" lang="ja">'+gl(esc(pt[0]))+'</div>'+(ex?'<div class="v">'+gl(esc(ex))+'</div>':'')+'</div>':'')+'</div>';
     });
     h+='</div></div>';
     var nq=chQ(n).filter(function(q){return q.br===i}).length;
@@ -210,24 +246,36 @@ function chapter(n,fb){
     app.onchange=function(e){if(e.target.dataset.set==='recall'){S.set.recall=e.target.checked;save();OPEN={};REV={};chapter(n)}};
     return;
   }
-  /* Bài giảng chi tiết: mục lục chương → từng mục (mở đầu, từng ý: câu gốc tiếng Nhật + giải thích, chú ý khi thi) */
-  var LX=(window.LECTURE||{})[n]||[];
-  h+='<div class="card lec-toc"><b>Chương này gồm '+cards.length+' phần</b><ol>'+cards.map(function(cd,i){return '<li><a href="#" data-toc="'+i+'">'+esc(cd[1])+' <span class="jp muted" lang="ja">'+esc(cd[0])+'</span></a></li>'}).join('')+'</ol></div>';
+  /* Bài giảng chi tiết: chọn ngôn ngữ → mục lục → từng mục (mở đầu, từng ý: câu gốc + giải thích, chú ý khi thi) */
+  var lang=S.set.lang||'vi', LV2=(window.LECTURE||{})[n]||[], LJ=(window.LECTURE_JA||{})[n]||[];
+  var TIP={vi:'Chú ý khi thi',ja:'試験のポイント'};
+  h+='<div class="seg seg-lang" role="group" aria-label="Ngôn ngữ bài giảng">'+[['vi','Tiếng Việt'],['ja','日本語'],['both','Song ngữ']].map(function(x){return '<button data-lang="'+x[0]+'" aria-pressed="'+(lang===x[0])+'"'+(lang===x[0]?' class="on"':'')+'>'+x[1]+'</button>'}).join('')+'</div>';
+  h+='<p class="muted gl-hint">Chạm vào từ <span class="gl demo">gạch chân</span> để xem nghĩa.</p>';
+  h+='<div class="card lec-toc"><b>'+(lang==='ja'?'この章の構成（全'+cards.length+'節）':'Chương này gồm '+cards.length+' phần')+'</b><ol>'+cards.map(function(cd,i){return '<li><a href="#" data-toc="'+i+'">'+(lang==='ja'?'<span lang="ja">'+esc(cd[0])+'</span>':esc(cd[1])+' <span class="jp muted" lang="ja">'+esc(cd[0])+'</span>')+'</a></li>'}).join('')+'</ol></div>';
+  function blk(vi,ja,cls){
+    var a=lang!=='vi'&&ja?'<p class="'+cls+' ja" lang="ja">'+gl(esc(ja))+'</p>':'', b=lang!=='ja'&&vi?'<p class="'+cls+(lang==='both'?' vi2':'')+'">'+gl(esc(vi))+'</p>':'';
+    return a+b;
+  }
   cards.forEach(function(cd,i){
-    var k=n+'-'+i, lx=LX[i];
-    h+='<article class="card lec" id="lec'+i+'"><div class="lec-h"><span class="lec-n">'+(i+1)+'</span><div><h3>'+esc(cd[1])+'</h3><div class="sub jp" lang="ja">'+esc(cd[0])+'</div></div></div>';
-    if(lx) h+='<p class="lec-intro">'+esc(lx[0])+'</p>';
+    var k=n+'-'+i, lv=LV2[i], lj=LJ[i];
+    h+='<article class="card lec" id="lec'+i+'"><div class="lec-h"><span class="lec-n">'+(i+1)+'</span><div>'+(lang==='ja'?'<h3 lang="ja">'+esc(cd[0])+'</h3>':'<h3>'+esc(cd[1])+'</h3><div class="sub jp" lang="ja">'+esc(cd[0])+'</div>')+'</div></div>';
+    h+=blk(lv&&lv[0],lj&&lj[0],'lec-intro');
     cd[2].forEach(function(p,j){
-      var ex=lx&&lx[1][j];
-      h+='<section class="lec-pt"><div class="lec-src" lang="ja">'+esc(p[0])+'</div>'+(ex?'<p>'+esc(ex)+'</p>':(p[1]?'<p>'+esc(p[1])+'</p>':''))+'</section>';
+      h+='<section class="lec-pt"><div class="lec-src" lang="ja">'+gl(esc(p[0]))+'</div>'+blk((lv&&lv[1][j])||p[1],lj&&lj[1][j],'lec-p')+'</section>';
     });
-    if(lx&&lx[2]) h+='<div class="lec-tip"><b>Chú ý khi thi</b>'+esc(lx[2])+'</div>';
+    if((lv&&lv[2])||(lj&&lj[2])){
+      h+='<div class="lec-tip">';
+      if(lang!=='vi'&&lj&&lj[2]) h+='<b>'+TIP.ja+'</b><div lang="ja">'+gl(esc(lj[2]))+'</div>';
+      if(lang!=='ja'&&lv&&lv[2]) h+='<b'+(lang==='both'?' style="margin-top:6px"':'')+'>'+TIP.vi+'</b><div>'+gl(esc(lv[2]))+'</div>';
+      h+='</div>';
+    }
     h+='<label class="sw" style="border-top:1px solid var(--line);margin-top:8px"><span class="muted">Đã đọc mục này</span><input type="checkbox" data-read="'+k+'"'+(S.read[k]?' checked':'')+'></label></article>';
   });
   var terms=window.TERMS.filter(function(t){return t[3]===n});
   if(terms.length){h+='<h2>Thuật ngữ của chương</h2><div class="card">'+terms.map(termRow).join('')+'</div>'}
   app.innerHTML=h;
   app.onclick=function(e){var t=e.target.closest('[data-m]'); if(t){chapter.m=t.dataset.m;chapter(n);return}
+    t=e.target.closest('[data-lang]'); if(t){S.set.lang=t.dataset.lang;save();var yy=window.scrollY;chapter(n);window.scrollTo(0,yy);return}
     t=e.target.closest('[data-toc]'); if(t){e.preventDefault();var el=document.getElementById('lec'+t.dataset.toc);if(el)el.scrollIntoView({block:'start'});return}
     if(e.target.closest('[data-act=test]')) startTest(n);
     if(e.target.closest('[data-act=pr]')) startPractice(S.set.shuffle?shuffle(qs):qs,'第'+n+'章','#learn/'+n)};

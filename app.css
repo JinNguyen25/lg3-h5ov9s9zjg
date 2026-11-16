@@ -213,3 +213,18 @@ button.t-leaf.hid{background:var(--line);border:0;border-bottom:2px dashed var(-
 .upd{position:fixed;left:12px;right:12px;bottom:calc(var(--tab-h) + 12px + env(safe-area-inset-bottom));z-index:30;display:flex;align-items:center;gap:10px;justify-content:space-between;background:var(--ink);color:var(--card);border-radius:14px;padding:10px 12px;box-shadow:0 6px 24px rgba(0,0,0,.25);font-weight:600}
 .upd[hidden]{display:none}
 @media (min-width:900px){.upd{left:auto;right:24px;bottom:24px;max-width:360px}}
+
+/* Từ gạch chân + khung nghĩa */
+.gl{all:unset;cursor:pointer;color:inherit;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:3px;border-radius:3px}
+.gl:hover,.gl.on{background:var(--soft);text-decoration-style:solid}
+.gl:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.gl.demo{cursor:default}
+.gl-hint{margin:-4px 0 10px;font-size:13px}
+#glpop{position:fixed;z-index:50;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:12px 14px;line-height:1.55}
+#glpop[hidden]{display:none}
+.gl-w{font:700 17px var(--jp)}.gl-r{font-size:13px;color:var(--mute);font-family:var(--jp)}.gl-m{margin-top:6px;font-size:14.5px}
+/* Bài giảng song ngữ */
+.lec p.ja{font-family:var(--jp);line-height:1.85}
+.lec p.vi2{color:var(--mute);font-size:14.5px;margin-top:4px}
+.lec-p{margin:8px 0 0;line-height:1.75;font-size:15.5px}
+.lec-tip div{margin-bottom:2px}
