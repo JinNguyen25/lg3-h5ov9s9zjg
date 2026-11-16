@@ -135,11 +135,11 @@ function mindmap(n,cards){
     h+='<div class="hookline"><span>Mẹo nhớ</span>'+esc(b.h)+'</div>';
     h+='<div class="tree" data-tree="'+i+'"><svg class="tlinks" aria-hidden="true"></svg><div class="t-root" lang="ja">'+esc(b.k)+'</div><div class="t-kids">';
     b.c.forEach(function(ch,j){
-      var k=n+'-'+i+'-'+j, o=OPEN[k], pt=cd[2][ch[2]]||['',''];
+      var k=n+'-'+i+'-'+j, o=OPEN[k], pt=cd[2][ch[2]]||['',''], lx=((window.LECTURE||{})[n]||[])[i], ex=(lx&&lx[1][ch[2]])||pt[1];
       h+='<div class="t-row"><button class="t-sub'+(o?' open':'')+'" data-sub="'+k+'" aria-expanded="'+(o?'true':'false')+'" lang="ja">'+esc(ch[0])+'</button><div class="t-leaves">';
       ch[1].forEach(function(f,m){var rk=k+'-'+m, hid=rc&&!REV[rk];
         h+=hid?'<button class="t-leaf hid" data-lf="'+rk+'" aria-label="Chạm để xem">?</button>':'<span class="t-leaf" lang="ja">'+esc(f)+'</span>'});
-      h+='</div>'+(o?'<div class="t-detail"><div class="j" lang="ja">'+esc(pt[0])+'</div>'+(pt[1]&&S.set.vi?'<div class="v">'+esc(pt[1])+'</div>':'')+'</div>':'')+'</div>';
+      h+='</div>'+(o?'<div class="t-detail"><div class="j" lang="ja">'+esc(pt[0])+'</div>'+(ex?'<div class="v">'+esc(ex)+'</div>':'')+'</div>':'')+'</div>';
     });
     h+='</div></div>';
     var nq=chQ(n).filter(function(q){return q.br===i}).length;
@@ -210,16 +210,25 @@ function chapter(n,fb){
     app.onchange=function(e){if(e.target.dataset.set==='recall'){S.set.recall=e.target.checked;save();OPEN={};REV={};chapter(n)}};
     return;
   }
+  /* Bài giảng chi tiết: mục lục chương → từng mục (mở đầu, từng ý: câu gốc tiếng Nhật + giải thích, chú ý khi thi) */
+  var LX=(window.LECTURE||{})[n]||[];
+  h+='<div class="card lec-toc"><b>Chương này gồm '+cards.length+' phần</b><ol>'+cards.map(function(cd,i){return '<li><a href="#" data-toc="'+i+'">'+esc(cd[1])+' <span class="jp muted" lang="ja">'+esc(cd[0])+'</span></a></li>'}).join('')+'</ol></div>';
   cards.forEach(function(cd,i){
-    var k=n+'-'+i;
-    h+='<div class="card note"><h3>'+esc(cd[0])+'</h3><div class="sub">'+esc(cd[1])+'</div>';
-    cd[2].forEach(function(p){h+='<div class="pt"><div class="j" lang="ja">'+esc(p[0])+'</div>'+(p[1]&&S.set.vi?'<div class="v">'+esc(p[1])+'</div>':'')+'</div>'});
-    h+='<label class="sw" style="border-top:1px solid var(--line);margin-top:4px"><span class="muted">Đã đọc mục này</span><input type="checkbox" data-read="'+k+'"'+(S.read[k]?' checked':'')+'></label></div>';
+    var k=n+'-'+i, lx=LX[i];
+    h+='<article class="card lec" id="lec'+i+'"><div class="lec-h"><span class="lec-n">'+(i+1)+'</span><div><h3>'+esc(cd[1])+'</h3><div class="sub jp" lang="ja">'+esc(cd[0])+'</div></div></div>';
+    if(lx) h+='<p class="lec-intro">'+esc(lx[0])+'</p>';
+    cd[2].forEach(function(p,j){
+      var ex=lx&&lx[1][j];
+      h+='<section class="lec-pt"><div class="lec-src" lang="ja">'+esc(p[0])+'</div>'+(ex?'<p>'+esc(ex)+'</p>':(p[1]?'<p>'+esc(p[1])+'</p>':''))+'</section>';
+    });
+    if(lx&&lx[2]) h+='<div class="lec-tip"><b>Chú ý khi thi</b>'+esc(lx[2])+'</div>';
+    h+='<label class="sw" style="border-top:1px solid var(--line);margin-top:8px"><span class="muted">Đã đọc mục này</span><input type="checkbox" data-read="'+k+'"'+(S.read[k]?' checked':'')+'></label></article>';
   });
   var terms=window.TERMS.filter(function(t){return t[3]===n});
   if(terms.length){h+='<h2>Thuật ngữ của chương</h2><div class="card">'+terms.map(termRow).join('')+'</div>'}
   app.innerHTML=h;
   app.onclick=function(e){var t=e.target.closest('[data-m]'); if(t){chapter.m=t.dataset.m;chapter(n);return}
+    t=e.target.closest('[data-toc]'); if(t){e.preventDefault();var el=document.getElementById('lec'+t.dataset.toc);if(el)el.scrollIntoView({block:'start'});return}
     if(e.target.closest('[data-act=test]')) startTest(n);
     if(e.target.closest('[data-act=pr]')) startPractice(S.set.shuffle?shuffle(qs):qs,'第'+n+'章','#learn/'+n)};
   app.onchange=function(e){var k=e.target.dataset.read;if(k){if(e.target.checked)S.read[k]=1;else delete S.read[k];save()}};
