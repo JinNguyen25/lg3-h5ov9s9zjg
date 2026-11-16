@@ -115,9 +115,10 @@ function learn(){
 /* ---------- Sơ đồ tư duy ---------- */
 var OPEN={};   /* ý đang mở trong sơ đồ (chỉ trong phiên này) */
 function mmPos(i,n){var a=-Math.PI/2+i*2*Math.PI/n;return {x:Math.max(16,Math.min(84,50+36*Math.cos(a))),y:50+38*Math.sin(a)}}
-/* gợi ý ở chế độ tự nhớ lại: giữ phần đầu của nhãn (trước :, →, =), che phần sau */
-function cue(lb,j){var m=lb.match(/^(.{2,14}?)\s*(:|：|→|=|＝)/);if(m)return esc(m[1])+' '+m[2]+' …';
-  var c=[...lb];return c.length>=6?esc(c.slice(0,Math.max(2,Math.floor(c.length/3))).join(''))+'…':'Ý '+(j+1)}
+/* Nhánh vẽ thành cây ngang kiểu mind map: tên nhánh → nút con (1–3 từ) → các ý ngắn.
+   Đường nối là đường cong màu nhánh, nét to gần gốc và nhỏ dần ra ngoài (quy tắc của Buzan).
+   Chế độ tự nhớ lại: các ý ngoài cùng bị che thành ô trống, chạm để lật. */
+var REV={};   /* ý đã lật ở chế độ tự nhớ lại (trong phiên này) */
 function mindmap(n,cards){
   var M=(window.MINDMAP||{})[n]; if(!M) return '';
   var rc=!!S.set.recall, nb=M.b.length, svg='', nodes='';
@@ -125,25 +126,46 @@ function mindmap(n,cards){
     svg+='<line x1="50" y1="50" x2="'+p.x.toFixed(1)+'" y2="'+p.y.toFixed(1)+'" style="stroke:var(--b'+(i%7)+')"/>';
     nodes+='<button class="mm-n" data-go-b="'+i+'" style="left:'+p.x.toFixed(1)+'%;top:'+p.y.toFixed(1)+'%;--c:var(--b'+(i%7)+')"><i>'+(i+1)+'</i>'+esc(b.k)+(st==null?'':st?' <span class="ok" aria-label="đã nhớ">✓</span>':' <span class="no" aria-label="cần ôn">!</span>')+'</button>'});
   var h='<div class="mm"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">'+svg+'</svg><div class="mm-c"><b>第'+n+'章</b><span>'+esc(CH[n-1].vi)+'</span></div>'+nodes+'</div>';
-  h+='<div class="card story"><b>Câu chuyện của chương</b><p>'+esc(M.s)+'</p></div>';
-  h+='<div class="card"><label class="sw"><span><b>Chế độ tự nhớ lại</b><small class="muted" style="display:block">Che các ý; nhìn từ khóa nhánh, tự nhớ rồi chạm để kiểm tra</small></span><input type="checkbox" data-set="recall"'+(rc?' checked':'')+'></label></div>';
+  h+='<div class="card story"><p>'+esc(M.s)+'</p></div>';
+  h+='<div class="card"><label class="sw"><span><b>Chế độ tự nhớ lại</b><small class="muted" style="display:block">Che các ý ngoài cùng; nhìn nhánh và nút con, tự nhớ rồi chạm để lật</small></span><input type="checkbox" data-set="recall"'+(rc?' checked':'')+'></label></div>';
   h+='<div class="branches">';
   M.b.forEach(function(b,i){
-    var cd=cards[i]||['','',[]], st=S.mm[n+'-'+i];
+    var cd=cards[i]||['','',[]];
     h+='<section class="br" id="br'+i+'" style="--c:var(--b'+(i%7)+')"><div class="br-h"><span class="dot">'+(i+1)+'</span><div class="grow"><b>'+esc(b.k)+'</b><div class="jp muted" lang="ja">'+esc(cd[0])+'</div></div>'+brTag(n,i)+'</div>';
-    if(!rc) h+='<div class="hook"><b>Mẹo nhớ</b>'+esc(b.h)+'</div>';
-    h+='<ul class="leaves">';
-    b.l.forEach(function(lb,j){var k=n+'-'+i+'-'+j,o=OPEN[k],p=cd[2][j]||['',''];
-      h+='<li><button class="leaf'+(o?' open':'')+'" data-leaf="'+k+'" aria-expanded="'+(o?'true':'false')+'" aria-controls="ld'+k+'"><span class="lk">'+(rc&&!o?'<span class="muted">'+cue(lb,j)+' · chạm để xem</span>':esc(lb))+'</span><span class="chev">'+(o?'−':'+')+'</span></button>'+
-        (o?'<div class="leaf-d" id="ld'+k+'"><div class="j" lang="ja">'+esc(p[0])+'</div>'+(p[1]&&S.set.vi?'<div class="v">'+esc(p[1])+'</div>':'')+'</div>':'')+'</li>'});
-    h+='</ul>';
-    if(rc) h+='<details class="hook"><summary><b>Xem mẹo nhớ</b></summary>'+esc(b.h)+'</details>';
+    h+='<div class="hookline"><span>Mẹo nhớ</span>'+esc(b.h)+'</div>';
+    h+='<div class="tree" data-tree="'+i+'"><svg class="tlinks" aria-hidden="true"></svg><div class="t-root" lang="ja">'+esc(b.k)+'</div><div class="t-kids">';
+    b.c.forEach(function(ch,j){
+      var k=n+'-'+i+'-'+j, o=OPEN[k], pt=cd[2][ch[2]]||['',''];
+      h+='<div class="t-row"><button class="t-sub'+(o?' open':'')+'" data-sub="'+k+'" aria-expanded="'+(o?'true':'false')+'" lang="ja">'+esc(ch[0])+'</button><div class="t-leaves">';
+      ch[1].forEach(function(f,m){var rk=k+'-'+m, hid=rc&&!REV[rk];
+        h+=hid?'<button class="t-leaf hid" data-lf="'+rk+'" aria-label="Chạm để xem">?</button>':'<span class="t-leaf" lang="ja">'+esc(f)+'</span>'});
+      h+='</div>'+(o?'<div class="t-detail"><div class="j" lang="ja">'+esc(pt[0])+'</div>'+(pt[1]&&S.set.vi?'<div class="v">'+esc(pt[1])+'</div>':'')+'</div>':'')+'</div>';
+    });
+    h+='</div></div>';
     var nq=chQ(n).filter(function(q){return q.br===i}).length;
     h+='<div class="btns">'+(nq?'<button class="btn small" data-brq="'+i+'">Luyện '+nq+' câu</button>':'')+'<button class="btn small" data-mm="'+i+'" data-v="0">Còn quên</button><button class="btn small primary" data-mm="'+i+'" data-v="1">Nhớ hết</button></div>';
     h+='</section>';
   });
   return h+'</div>';
 }
+
+/* vẽ đường cong nối các nút của cây (gọi sau mỗi lần dựng trang và khi đổi kích thước) */
+function drawTrees(){
+  document.querySelectorAll('.tree').forEach(function(t){
+    var svg=t.querySelector('.tlinks'), R=t.getBoundingClientRect(), root=t.querySelector('.t-root').getBoundingClientRect(), d='';
+    svg.setAttribute('width',R.width);svg.setAttribute('height',R.height);
+    function cv(x1,y1,x2,y2,w){var mx=(x1+x2)/2;return '<path d="M'+x1.toFixed(1)+' '+y1.toFixed(1)+' C'+mx.toFixed(1)+' '+y1.toFixed(1)+' '+mx.toFixed(1)+' '+y2.toFixed(1)+' '+x2.toFixed(1)+' '+y2.toFixed(1)+'" stroke-width="'+w+'"/>'}
+    var rx=root.right-R.left, ry=root.top+root.height/2-R.top;
+    t.querySelectorAll('.t-row').forEach(function(row){
+      var sb=row.querySelector('.t-sub').getBoundingClientRect(), sy=sb.top+sb.height/2-R.top;
+      d+=cv(rx,ry,sb.left-R.left,sy,4);
+      row.querySelectorAll('.t-leaf').forEach(function(lf){var l=lf.getBoundingClientRect();
+        d+=cv(sb.right-R.left,sy,l.left-R.left,l.bottom-R.top-2,1.8)});
+    });
+    svg.innerHTML=d;
+  });
+}
+window.addEventListener('resize',function(){clearTimeout(drawTrees.t);drawTrees.t=setTimeout(drawTrees,120)});
 /* Bài kiểm tra chương: 10 câu, mỗi nhánh ít nhất 1 câu, ưu tiên câu đang sai rồi câu chưa làm (lấy từ cả đề khóa học lẫn câu tự soạn) */
 function startTest(n){
   var p=chQ(n), wr=shuffle(p.filter(function(q){var r=S.q[q.id];return r&&!r.last})), un=shuffle(p.filter(function(q){return !S.q[q.id]})), ok=shuffle(p.filter(function(q){var r=S.q[q.id];return r&&r.last}));
@@ -170,19 +192,22 @@ function chapter(n,fb){
   if(mode==='map'){
     var tm=window.TERMS.filter(function(t){return t[3]===n});
     h+=mindmap(n,cards)+(tm.length?'<h2>Thuật ngữ của chương</h2><div class="card">'+tm.map(termRow).join('')+'</div>':'')+'<div class="card muted">Học xong sơ đồ thì bấm <b>Kiểm tra hiểu bài</b> ở đầu trang.</div>';
-    app.innerHTML=h;
+    app.innerHTML=h;drawTrees();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(drawTrees);
     if(fb!=null){var fe=document.getElementById('br'+fb);if(fe)setTimeout(function(){fe.scrollIntoView({block:'start'})},0)}
     app.onclick=function(e){
       var t=e.target.closest('[data-m]'); if(t){chapter.m=t.dataset.m;chapter(n);return}
       t=e.target.closest('[data-brq]'); if(t){var bi=+t.dataset.brq;startPractice(shuffle(qs.filter(function(q){return q.br===bi})),'Nhánh '+(bi+1)+': '+brName(n,bi),'#learn/'+n+'/'+bi);return}
-      t=e.target.closest('[data-leaf]'); if(t){var k=t.dataset.leaf;OPEN[k]=!OPEN[k];var y=window.scrollY;chapter(n);window.scrollTo(0,y);var f=app.querySelector('[data-leaf="'+k+'"]');if(f)f.focus({preventScroll:true});return}
+      t=e.target.closest('[data-sub]'); if(t){var k=t.dataset.sub;
+        if(S.set.recall&&app.querySelector('[data-lf^="'+k+'-"]')){t.closest('.t-row').querySelectorAll('[data-lf]').forEach(function(x){REV[x.dataset.lf]=1})} else OPEN[k]=!OPEN[k];
+        var y=window.scrollY;chapter(n);window.scrollTo(0,y);var f=app.querySelector('[data-sub="'+k+'"]');if(f)f.focus({preventScroll:true});return}
+      t=e.target.closest('[data-lf]'); if(t){REV[t.dataset.lf]=1;var y3=window.scrollY;chapter(n);window.scrollTo(0,y3);return}
       t=e.target.closest('[data-go-b]'); if(t){var el=document.getElementById('br'+t.dataset.goB);if(el)el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});return}
       t=e.target.closest('[data-mm]'); if(t){var i=+t.dataset.mm,ok=t.dataset.v==='1';brMark(n+'-'+i,ok);if(ok)S.read[n+'-'+i]=1;else delete S.read[n+'-'+i];save();
-        (window.MINDMAP[n].b[i].l||[]).forEach(function(_,j){delete OPEN[n+'-'+i+'-'+j]});var y2=window.scrollY;chapter(n);window.scrollTo(0,y2);toast(ok?'Đã đánh dấu nhớ nhánh '+(i+1):'Nhánh '+(i+1)+' cần ôn lại');return}
+        Object.keys(REV).forEach(function(r){if(r.indexOf(n+'-'+i+'-')===0)delete REV[r]});var y2=window.scrollY;chapter(n);window.scrollTo(0,y2);toast(ok?'Đã đánh dấu nhớ nhánh '+(i+1):'Nhánh '+(i+1)+' cần ôn lại');return}
       if(e.target.closest('[data-act=test]')) startTest(n);
       if(e.target.closest('[data-act=pr]')) startPractice(S.set.shuffle?shuffle(qs):qs,'第'+n+'章','#learn/'+n);
     };
-    app.onchange=function(e){if(e.target.dataset.set==='recall'){S.set.recall=e.target.checked;save();OPEN={};chapter(n)}};
+    app.onchange=function(e){if(e.target.dataset.set==='recall'){S.set.recall=e.target.checked;save();OPEN={};REV={};chapter(n)}};
     return;
   }
   cards.forEach(function(cd,i){

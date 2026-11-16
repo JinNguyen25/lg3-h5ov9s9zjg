@@ -1,156 +1,339 @@
-/* Sơ đồ tư duy cho phần lý thuyết.
-   Mỗi chương: s = "câu chuyện" tóm cả chương; b = các nhánh, theo đúng thứ tự các mục trong window.THEORY[chương].
-   Mỗi nhánh: k = từ khóa của nhánh, h = mẹo nhớ, l = nhãn ngắn của từng ý (theo đúng thứ tự các ý trong mục).
-   Nội dung chi tiết (tiếng Nhật + giải thích) lấy từ THEORY nên không viết lại ở đây. */
+/* Sơ đồ tư duy (viết theo quy tắc mind map của Tony Buzan và skill mindmap-markmap-viewer, MIT):
+   - mỗi nút 1–3 từ, chi tiết đặt ở nút con; mỗi nhánh 3–6 nút con; một màu cho mỗi nhánh.
+   Mỗi chương: s = một câu tóm cả chương; b = các nhánh, theo đúng thứ tự các mục trong window.THEORY[chương].
+   Mỗi nhánh: k = tên nhánh, h = mẹo nhớ một dòng,
+   c = các nút con [nhãn, [các ý ngắn], chỉ số ý trong THEORY để mở phần giải thích đầy đủ]. */
 window.MINDMAP = {
-1:{s:'Logistics = đưa đúng hàng tới đúng chỗ, đúng lúc. Chương 1 trả lời 6 câu: nó là gì (định nghĩa) → làm những việc gì (6 chức năng) → ở khâu nào (6 lĩnh vực) → quản lý ra sao (5R, PDCA, 3 tầng) → phối hợp với ai → quy mô bao lớn (số liệu).',
+1:{s:'Logistics = đúng hàng, đúng chỗ, đúng lúc.',
 b:[
-{k:'Định nghĩa',h:'Ba vòng tròn lồng nhau: 物流 ⊂ ロジスティクス ⊂ SCM. Hàng (物) cần chỗ và lúc → 物流 lấp khoảng cách THỜI GIAN + KHÔNG GIAN; giấy tờ, tiền (商) cần chủ và tin → 商流 lấp SỞ HỮU + THÔNG TIN.',
- l:['物流: tích hợp 輸送・保管','ロジスティクス: rộng hơn, có cả 受発注','SCM: quản lý cả chuỗi','物流 → 時間・空間 / 商流 → 所有・情報']},
-{k:'6 chức năng',h:'Câu nhớ: "Chở – Cất – Bốc – Gói – Gia công – Tin" (輸送・保管・荷役・包装・流通加工・情報). Ba cái đầu là chính, hai cái sau hỗ trợ, 情報 nối tất cả. Bao gói 3 lớp như búp bê Nga: 個装 trong cùng → 内装 → 外装 ngoài cùng.',
- l:['輸送・保管・荷役・包装・流通加工・情報','包装 3 lớp: 個装・内装・外装','ノード (cứ điểm) & リンク (tuyến)']},
-{k:'6 lĩnh vực',h:'Như mạch máu: 動脈 (động mạch) đưa hàng ĐI = 調達 → 社内 → 販売; 静脈 (tĩnh mạch) đưa hàng VỀ = 返品・回収・廃棄. Rác nhà (一般) do 市町村 lo; rác nhà máy (産業) ai thải người đó lo.',
- l:['動脈: 調達・社内・販売','静脈: 返品・回収・廃棄','一般 → 市町村 / 産業 → 排出事業者','3R: Reduce・Reuse・Recycle']},
-{k:'Nền tảng quản lý',h:'5 chữ Right: đúng HÀNG, đúng CHỖ, đúng LÚC, đúng ĐIỀU KIỆN, đúng CHI PHÍ (Cost). Quản lý xoay vòng PDCA. Ba tầng như trong công ty: giám đốc (戦略) – quản lý (運営) – công nhân (作業).',
- l:['5R (5適)','PDCA','3 tầng: 戦略・運営・作業','Kỳ: 中長期・年次・月次/週次/日次']},
-{k:'Phối hợp',h:'Đi một vòng công ty: Sản xuất (VMI) → Kinh doanh (EDI, khuyến mãi) → Phát triển sản phẩm (DFL) → Tài chính & IT → ra ngoài công ty (SCM, かんばん, 3PL).',
- l:['生産: VMI','営業: EDI・販促','開発: DFL','財務・情報システム','企業間: SCM・かんばん・ECR・共同化・3PL']},
-{k:'Số liệu',h:'55,4 nghìn tỷ yên ≈ 9,3% GDP (2022: 9,6%) (vận tải 34,7 là phần lớn nhất). Tỉ lệ chi phí/doanh thu 5,32%. Ngành xe tải: 18,3 nghìn tỷ yên, 6,3 vạn công ty, 201 vạn người, 99% là doanh nghiệp nhỏ.',
- l:['マクロ物流コスト 55.4兆円','売上高物流コスト比率 5.32%','トラック: 18.3兆円・6.3万社・201万人','EC: BtoC 14.7兆円・9.38% / BtoB 465兆円・40%','保管 = 貯蔵 + 保管 / 流通加工 = 生産 + 販促']}
+{k:'Định nghĩa',h:'Ba vòng lồng nhau: 物流 ⊂ ロジスティクス ⊂ SCM',c:[
+ ['物流',['= 物的流通','輸送 + 保管 gộp lại'],0],
+ ['ロジスティクス',['rộng hơn 物流','có cả 受発注','gốc: 兵站 (quân sự)'],1],
+ ['SCM',['quản lý cả chuỗi','chứa Logistics'],2],
+ ['Khoảng cách',['物流: thời gian, không gian','商流: sở hữu, thông tin'],3]]},
+{k:'6 chức năng',h:'Chở – Cất – Bốc – Gói – Gia công – Tin',c:[
+ ['Chính',['輸送','保管','荷役'],0],
+ ['Hỗ trợ',['包装','流通加工'],0],
+ ['情報',['nối tất cả'],0],
+ ['包装 3 lớp',['個装 → 内装 → 外装'],1],
+ ['ノード・リンク',['ノード = cứ điểm','リンク = tuyến','thêm kho: giao ↓, tồn ↑'],2]]},
+{k:'6 lĩnh vực',h:'動脈 đưa hàng ĐI, 静脈 đưa hàng VỀ',c:[
+ ['動脈',['調達','社内','販売 (配送)'],0],
+ ['静脈',['返品 (phí ≈ ×3)','回収 (pallet, recall)','廃棄'],1],
+ ['Rác thải',['一般 → 市町村','産業 → bên thải ra'],2],
+ ['3R',['Reduce・Reuse・Recycle'],3]]},
+{k:'Quản lý',h:'5R = đúng Hàng – Chỗ – Lúc – Điều kiện – Chi phí',c:[
+ ['5R',['Product・Place・Time','Condition・Cost'],0],
+ ['PDCA',['Plan → Do → Check → Action'],1],
+ ['3 tầng',['戦略','運営 (4 mảng)','作業'],2],
+ ['Kỳ hạn',['中長期・年次','月次・週次・日次'],3]]},
+{k:'Phối hợp',h:'Đi một vòng công ty rồi ra ngoài',c:[
+ ['生産',['VMI: NCC tự bổ sung'],0],
+ ['営業',['EDI nhận đơn','khuyến mãi, rebate'],1],
+ ['開発',['DFL: thiết kế dễ chở'],2],
+ ['財務・IT',['tồn kho = tài sản','hệ thống thông tin'],3],
+ ['Liên DN',['SCM・かんばん・ECR','共同化・3PL'],4]]},
+{k:'Số liệu',h:'Nhớ "55 – 5 – 18": 55,4兆円 · 5,32% · 18,3兆円',c:[
+ ['マクロ',['55.4兆円 (2023)','≈ 9,3% GDP','輸送 34.7 lớn nhất'],0],
+ ['売上高比率',['5.32% (2025)','đỉnh 5.70% (2021)'],1],
+ ['トラック業',['18.3兆円・6.3万社','201万人・99% DN nhỏ'],2],
+ ['EC',['BtoC 14.7兆円・9.38%','BtoB 465兆円・40%'],3],
+ ['Chia nhỏ',['保管 = 貯蔵 + 保管','加工 = 生産 + 販促'],4]]}
 ]},
-2:{s:'Ngành logistics đang thiếu người và bị giới hạn giờ làm (vấn đề 2024), phải giảm CO2, phải giữ an toàn. Cách giải chung: bớt giờ chờ, chuyển sang tàu và đường sắt, tuyển và giữ người.',
+2:{s:'Thiếu tài xế, giờ làm bị siết → bớt chờ, chuyển tàu, giữ người.',
 b:[
-{k:'Vấn đề 2024',h:'Số 960: giờ làm thêm tối đa một năm của tài xế từ 4/2024. Thiếu năng lực vận tải: 14% (2024) → 34% (2030), nhớ "mười bốn rồi ba mươi tư".',
- l:['上限 年960時間 (từ 4/2024)','輸送能力不足 14% → 34%','Giờ dài, lương thấp, già hóa']},
-{k:'Giờ ràng buộc',h:'拘束 13 tiếng/ngày, tối đa 15: nhớ "mười ba – mười lăm". Thời gian chờ hàng cũng tính vào 拘束. Gマーク là chứng nhận cho hãng VẬN TẢI, không phải cho chủ hàng.',
- l:['拘束時間 13h (tối đa 15h)','標準的な運賃 (2020)','中継輸送・予約・パレット化・ホワイト物流']},
-{k:'Môi trường',h:'Vận tải ≈ 1/5 lượng CO2 của Nhật (bài giảng chương 2: 18,7%; chương 3 ghi số năm 2021: 17,4%). Mục tiêu cả nước: giảm 46% (2030, so với 2013) → bằng 0 (2050); riêng 運輸部門 giảm 35% đến 2030. Ít CO2 nhất: đường sắt, rồi tàu biển, nhiều nhất là xe tải.',
- l:['運輸部門 ≈ 2割','Cả nước −46% (2030) / CN 2050','モーダルシフト','グリーン物流']},
-{k:'An toàn',h:'Tai nạn ngành xe tải gấp 4 lần trung bình, chủ yếu khi bốc dỡ (rơi, ngã). Chủ hàng ép chở quá tải, chạy quá sức → bị 勧告 và công bố tên.',
- l:['死傷災害 ×4, ngã khi 荷役','荷主勧告制度','買い物弱者 ~910万人','BCP']},
-{k:'Nhân lực',h:'Ba trụ: TUYỂN – GIỮ – CẢI THIỆN môi trường. パート xác định theo GIỜ làm ngắn hơn, không theo tên gọi. Làm tới 70 tuổi chỉ là nghĩa vụ NỖ LỰC.',
- l:['倉庫業 ≈ 1/6 トラック','パート: giờ làm ngắn hơn','70歳まで: 努力義務','特定技能 + 自動車運送業 (2024)','採用・定着・労働環境 + ES']},
-{k:'Số liệu',h:'Bằng lái: 準中型 từ 3,5 t (18 tuổi) – 中型 từ 7,5 t (20 tuổi, 2 năm kinh nghiệm) – 大型 từ 11 t (21 tuổi, 3 năm); dưới 3,5 t là 普通. Tỉ lệ tuyển người khuyết tật 2,3 → 2,5 → 2,7%. ISO26000: 7 nguyên tắc, 7 chủ đề, KHÔNG phải tiêu chuẩn cấp chứng nhận.',
- l:['求人倍率 2.11 / 2,104h','免許: 3.5t・7.5t・11t','障害者雇用率 2.3 → 2.5 (4/2024) → 2.7% (7/2026)','ISO26000: không chứng nhận, 7+7','労災 ~15,000人, 7割 khi 荷役']}
+{k:'Vấn đề 2024',h:'960 giờ; thiếu 14% rồi 34%',c:[
+ ['Trần làm thêm',['年960時間','từ 4/2024'],0],
+ ['Thiếu năng lực',['14% (2024)','34% (2030)'],1],
+ ['Tài xế',['giờ dài, lương thấp','≤29 tuổi chỉ ~10%'],2]]},
+{k:'Giờ ràng buộc',h:'拘束 "13 – 15": thường 13 giờ, tối đa 15',c:[
+ ['拘束時間',['13h/ngày, max 15h','tính cả giờ chờ'],0],
+ ['標準的な運賃',['công bố 2020','nâng thu nhập'],1],
+ ['Bớt chờ',['中継輸送','予約システム','パレット化','ホワイト物流 (ngoài bài)'],2],
+ ['Gマーク',['cho hãng vận tải','không phải chủ hàng'],2]]},
+{k:'Môi trường',h:'Đường sắt sạch nhất, xe tải bẩn nhất',c:[
+ ['CO2 vận tải',['≈ 1/5 cả nước','18.7% (bài chương 2)'],0],
+ ['Mục tiêu',['cả nước −46% (2030)','vận tải −35%','CN 2050'],1],
+ ['モーダルシフト',['xe → tàu hỏa, thuyền','鉄道 ít CO2 nhất'],2],
+ ['グリーン物流',['共同配送','積載率↑・エコドライブ'],3]]},
+{k:'An toàn',h:'Tai nạn ×4, phần lớn khi bốc dỡ',c:[
+ ['Tai nạn',['×4 trung bình','ngã khi 荷役'],0],
+ ['荷主勧告',['chủ hàng ép → 勧告','công bố tên'],1],
+ ['買い物弱者',['~910万人','宅配・移動販売'],2],
+ ['BCP',['chạy tiếp khi thiên tai','phân tán kho, NCC'],3]]},
+{k:'Nhân lực',h:'Tuyển – Giữ – Cải thiện',c:[
+ ['倉庫業',['≈ 1/6 xe tải','đang tăng'],0],
+ ['パート',['giờ làm ngắn hơn','không theo tên gọi'],1],
+ ['高年齢者',['đến 70 tuổi','努力義務'],2],
+ ['特定技能',['+ 自動車運送業 (2024)'],3],
+ ['3 trụ',['採用・定着・環境','+ ES'],4]]},
+{k:'Số liệu',h:'Bằng lái 3,5 – 7,5 – 11 tấn ↔ 18 – 20 – 21 tuổi',c:[
+ ['Tài xế',['求人倍率 2.11','2,104h/năm'],0],
+ ['免許',['準中型 3.5t〜 (18)','中型 7.5t〜 (20)','大型 11t〜 (21)'],1],
+ ['障害者雇用',['2.3 → 2.5 → 2.7%'],2],
+ ['ISO26000',['không chứng nhận','7 nguyên tắc, 7 chủ đề'],3],
+ ['労災',['~15,000人/năm','7割 khi 荷役'],4]]}
 ]},
-3:{s:'Nhà nước điều tiết logistics bằng: kế hoạch lớn (大綱) → các loại thủ tục (許可・登録…) → luật lao động và thầu phụ → luật an toàn → luật vận tải, kho → luật môi trường. Mẹo: luôn để ý năm và con số.',
+3:{s:'Nhà nước điều tiết logistics bằng kế hoạch, thủ tục và luật.',
 b:[
-{k:'Đại cương lần 7',h:'Đời 7 (2021–2025) có 3 cụm: 簡素で滑らか (trơn tru, DX) – 担い手にやさしい (tử tế với người lao động) – 強くてしなやか (mạnh và dẻo dai).',
- l:['3 trụ 2021–2025','物流DX: cơ giới hóa, số hóa']},
-{k:'Loại thủ tục',h:'許可 = gỡ một lệnh cấm chung; 認可 = cơ quan đồng ý thì hành vi mới có hiệu lực; 登録 = ghi tên vào sổ công; 届出 = chỉ cần báo. Thang văn bản: 法律 (Quốc hội) → 政令 (Nội các) → 省令 (Bộ) → 告示・通達.',
- l:['許可・認可・登録・届出','法律 → 政令 → 省令 → 告示']},
-{k:'Lao động & thầu phụ',h:'Số của luật lao động: 8 giờ/ngày, 40 giờ/tuần; nghỉ 45 phút (trên 6 giờ), 1 giờ (trên 8 giờ). Làm thêm cần 36協定, trần 45 giờ/tháng, 360 giờ/năm. 下請法 đổi tên thành 取適法 từ 1/2026 (ngoài bài giảng) – đề theo sách vẫn có thể gọi 下請法. Lái 4 tiếng → nghỉ 30 phút. Lãi chậm trả thầu phụ 14,6%.',
- l:['36協定: 月45h・年360h','下請法 → 取適法 (1/2026)','8h/日・40h/週; nghỉ 45分 / 1h','Lái 4h → nghỉ 30分 (mỗi lần ≥10分)','二重派遣・偽装請負: cấm','遅延利息 14.6% / 物流特殊指定']},
-{k:'An toàn & ngành',h:'Số cần thuộc: 300 xe (運輸安全マネジメント); 8 tấn / 5 tấn và 90 km/h (bộ hạn chế tốc độ); mỗi kho 1 倉庫管理主任者; từ 50 người → 防火管理者.',
- l:['運輸安全マネジメント: ≥300両','速度抑制装置: 90km/h','2024改正: 実運送体制管理簿','倉庫管理主任者・防火管理者']},
-{k:'Vận tải, kho, giao thông',h:'Xe tải kinh doanh = 許可; kho = 登録; 利用運送 loại 1 = 登録, loại 2 = 許可 (loại 2 làm door-to-door nên chặt hơn). Cước xe tải: báo SAU (事後届出).',
- l:['トラック事業: 許可, 運賃 事後届出','利用運送: 第一種 登録・第二種 許可','倉庫業: 登録','準中型免許: 18歳 (2017)']},
-{k:'Môi trường & nguy hiểm',h:'物流効率化法: chủ hàng lớn phải chọn CLO. 省エネ法: chỉ đơn vị "特定" (quy mô lớn) mới phải lập kế hoạch và báo cáo, không phải mọi công ty.',
- l:['物流効率化法: CLO','省エネ法: 特定荷主・特定輸送事業者','NOx・PM法 / 廃棄物処理法 / 消防法']},
-{k:'Đại cương các đời & số liệu',h:'Đời 6 "強い物流"; đời 7 ba trụ; đời 8 (2026–2030) bốn chữ 強く・賢く・優しく・つながる. Xe thường: rộng 2,5 m – dài 12 m – cao 3,8 m – nặng 20 t – trục 10 t.',
- l:['第6次「強い」/ 第7次 3 trụ','第8次 2026–2030: 強く・賢く・優しく・つながる','車両制限令: 2.5・12・3.8m・20t・10t','冷蔵倉庫 10区分 / 危険物 第4類','CO2: 運輸 17.4%, xe 86.8%']}
+{k:'Đại cương 7',h:'Đời 7: Trơn tru – Tử tế – Dẻo dai',c:[
+ ['簡素で滑らか',['DX, chuẩn hóa'],0],
+ ['担い手にやさしい',['cải cách lao động'],0],
+ ['強くてしなやか',['bền vững, chống chịu'],0],
+ ['物流DX',['cơ giới hóa','số hóa'],1]]},
+{k:'Thủ tục',h:'許可 gỡ cấm · 認可 cho hiệu lực · 登録 ghi sổ · 届出 báo',c:[
+ ['許可',['gỡ lệnh cấm chung'],0],
+ ['認可',['đồng ý mới có hiệu lực'],0],
+ ['登録',['ghi vào sổ công'],0],
+ ['届出',['chỉ cần báo'],0],
+ ['Thang văn bản',['法律 (Quốc hội)','政令 (Nội các)','省令 (Bộ) → 告示'],1]]},
+{k:'Lao động',h:'Bốn con số: 8 – 40 – 45 – 360',c:[
+ ['労基法',['8h/ngày, 40h/tuần','nghỉ 45分 (>6h)','nghỉ 1h (>8h)'],2],
+ ['36協定',['月45h','年360h'],0],
+ ['Lái xe',['4h → nghỉ 30分','chia ≥10分'],3],
+ ['派遣',['二重派遣: cấm','偽装請負: cấm'],4],
+ ['下請法',['→ 取適法 (1/2026)','cấm 買いたたき','lãi chậm 14.6%'],1],
+ ['物流特殊指定',['2004','theo vị thế, không vốn'],5]]},
+{k:'An toàn',h:'300 xe · 90 km/h · 1 người/kho · 50 người',c:[
+ ['運輸安全M',['2006','≥300両'],0],
+ ['速度抑制',['8t / 5t','90km/h'],1],
+ ['2024改正',['実運送体制管理簿','書面交付'],2],
+ ['Kho・PCCC',['倉庫管理主任者 mỗi kho','防火管理者 ≥50人'],3]]},
+{k:'Vận tải, kho',h:'Xe tải 許可 · Kho 登録 · Cước báo SAU',c:[
+ ['トラック事業',['許可制','運賃: 事後届出','運行管理者/営業所'],0],
+ ['利用運送',['第一種: 登録','第二種: 許可'],1],
+ ['倉庫業',['登録制','nhận 寄託'],2],
+ ['道交法',['準中型 18歳 (2017)','cấm 過積載'],3]]},
+{k:'Môi trường',h:'Chủ hàng lớn phải có CLO',c:[
+ ['物流効率化法',['特定事業者: kế hoạch','特定荷主: CLO'],0],
+ ['省エネ法',['chỉ đơn vị 特定','không phải mọi hãng'],1],
+ ['Luật khác',['NOx・PM法','廃棄物処理法','消防法'],2]]},
+{k:'Các đời & số',h:'Đời 8: 強く・賢く・優しく・つながる',c:[
+ ['第6次',['2017–2020','「強い物流」'],0],
+ ['第8次',['2026–2030','強く・賢く・優しく・つながる'],1],
+ ['車両制限令',['rộng 2.5m・dài 12m','cao 3.8m','20t・trục 10t'],2],
+ ['Kho lạnh・nguy hiểm',['冷蔵 10区分','危険物 第4類'],3],
+ ['CO2',['運輸 17.4%','xe 86.8%'],4]]}
 ]},
-4:{s:'Dịch vụ logistics là "lời hứa" với khách (giao nhanh, giao đúng). Chương 4: dịch vụ là gì → quản lý theo các bước → đo chất lượng bằng chỉ số → cải tiến bằng 7 công cụ QC.',
+4:{s:'Dịch vụ là lời hứa với khách → đặt mức → đo → cải tiến.',
 b:[
-{k:'Bản chất dịch vụ',h:'Dịch vụ VÔ HÌNH và không miễn phí: mức dịch vụ tăng thì chi phí tăng. Chọn mức dịch vụ cho LỢI NHUẬN cao nhất, không phải mức dịch vụ cao nhất.',
- l:['無形財: không chuyển sở hữu','物流サービス: quan trọng trong 顧客サービス','サービス ⇄ コスト','Hiện trường = tấm gương']},
-{k:'3 hạng mục',h:'Làm RÕ → ĐẶT mức → QUẢN LÝ bằng chỉ số.',
- l:['明確化 → 設定 → 指標で管理']},
-{k:'4 bước',h:'Biết người trước rồi mới biết mình: Benchmark (nhìn đối thủ) → Hiện trạng → Đặt mức → Đánh giá. Thứ tự này hay bị hỏi.',
- l:['①ベンチマーキング ②現状分析 ③水準設定 ④評価','Benchmark: đối thủ + mình + so sánh','水準 là tiền đề xây hệ thống','Đánh giá bằng con số']},
-{k:'Chất lượng',h:'物流事故 là "cái ô" to nhất (gồm hư hàng, tai nạn lao động, tai nạn giao thông). 度数率 đếm SỐ LẦN (×100万); 強度率 đo ĐỘ NẶNG (×1.000).',
- l:['納期・正確性・品質・事故・印象・環境','物流事故 = khái niệm rộng nhất','度数率 ×100万 / 強度率 ×1,000']},
-{k:'7 công cụ QC',h:'Pareto chọn việc cần làm trước; xương cá tìm nguyên nhân; 管理図 xem quá trình có ổn định (giới hạn 3σ); 散布図 xem tương quan; histogram xem phân bố; check sheet ghi đủ; 層別 chia nhóm.',
- l:['パレート図: chọn trọng điểm','特性要因図 (xương cá)','管理図: UCL・CL・LCL','散布図 / ヒストグラム','チェックシート・グラフ・層別']},
-{k:'Phương thức sản xuất',h:'Từ "nhận đơn rồi mới thiết kế" (ETO) đến "làm sẵn chờ bán" (MTS): càng về MTS giao càng nhanh, càng rẻ, càng khó đổi quy cách. Histogram 2 đỉnh → 層別; có "đảo lẻ" → dữ liệu bất thường.',
- l:['ETO → MTO → BTO → CTO → ATO → MTS','Các dạng histogram']}
+{k:'Bản chất',h:'Dịch vụ không miễn phí: chọn mức lời nhất',c:[
+ ['無形財',['không chuyển sở hữu'],0],
+ ['顧客サービス',['物流サービス là cốt lõi','nhanh, chính xác'],1],
+ ['Trade-off',['dịch vụ ↑ → phí ↑','chọn mức có lãi'],2],
+ ['Hiện trường',['tấm gương công ty'],3]]},
+{k:'3 hạng mục',h:'Làm rõ → Đặt mức → Đo',c:[
+ ['① 明確化',['ghi rõ dịch vụ'],0],
+ ['② 設定',['đặt mức dịch vụ'],0],
+ ['③ 指標',['quản lý bằng chỉ số'],0]]},
+{k:'4 bước',h:'Nhìn người → nhìn mình → đặt mức → chấm',c:[
+ ['① ベンチマーク',['đối thủ + mình','so sánh'],1],
+ ['② 現状分析',['hiện trạng'],0],
+ ['③ 水準設定',['tiền đề hệ thống','giờ chốt đơn, LT…'],2],
+ ['④ 評価',['bằng con số'],3]]},
+{k:'Chất lượng',h:'度数率 đếm LẦN · 強度率 đo NẶNG',c:[
+ ['Hạng mục',['納期・正確性・品質','事故・印象・環境'],0],
+ ['物流事故',['khái niệm rộng nhất'],1],
+ ['度数率',['死傷者 ÷ 時間','×100万'],2],
+ ['強度率',['損失日数 ÷ 時間','×1,000'],2]]},
+{k:'QC 7 công cụ',h:'Pareto chọn · Xương cá tìm · 管理図 canh',c:[
+ ['パレート図',['chọn trọng điểm','= ABC分析'],0],
+ ['特性要因図',['xương cá','tìm nguyên nhân'],1],
+ ['管理図',['UCL・CL・LCL','3σ'],2],
+ ['散布図・ヒスト',['tương quan','phân bố'],3],
+ ['Còn lại',['チェックシート','グラフ・層別'],4]]},
+{k:'Sản xuất',h:'ETO → MTS: nhanh hơn, rẻ hơn, khó đổi hơn',c:[
+ ['Dãy',['ETO・MTO・BTO','CTO・ATO・MTS'],0],
+ ['Phía MTS',['LT ngắn','giá rẻ, khó đổi'],0],
+ ['Histogram',['ふた山 → 層別','離れ小島 → bất thường'],1]]}
 ]},
-5:{s:'Hệ thống logistics = mạng lưới (kho đặt ở đâu, mấy cái) + vận hành trong kho + thuê ngoài và giao chung + ngoại thương. Chương dài nhất, nhiều câu nhất trong đề.',
+5:{s:'Kho đặt ở đâu, trong kho chạy ra sao, thuê ai, xuất nhập khẩu.',
 b:[
-{k:'Mạng lưới',h:'Nhiều kho → giao rẻ hơn nhưng kho và tồn kho đắt hơn (trade-off). 3 loại kho: DC giữ hàng, TC chỉ trung chuyển, PC gia công. 特積み: xuất chiều tối, trong 600 km → sáng hôm sau; 600–1.000 km → trong ngày hôm sau.',
- l:['ノード & リンク','Nhiều kho: giao ↓, kho/tồn ↑','DC・TC・PC','Xu hướng: 配送型・thuê・lớn・ven cảng','重心法: tấn-km nhỏ nhất','特積み: 600km → 翌日午前 / ~1,000km → 翌日中']},
-{k:'Theo ngành',h:'Nhà sản xuất GOM kho lại; bán buôn = "gom nhiều – chia nhiều" (集荷分散); bán lẻ giao về TRUNG TÂM rồi mới ra cửa hàng.',
- l:['メーカー: gom tồn kho','卸: 集荷分散','小売: センター納品・一括物流']},
-{k:'Tác nghiệp kho',h:'Đường đi của hàng: Nhận – Kiểm – Cất – Giữ – Lấy – Gia công – Kiểm – Đóng – Chia – Xuất. Hàng xuất NHIỀU LẦN để gần cửa. 摘み取り = lấy theo từng đơn; 種まき = lấy gom rồi "gieo" ra từng đơn.',
- l:['入荷 → … → 出荷','固定 / フリーロケーション','出荷頻度 ABC → gần cửa xuất','摘み取り / 種まき']},
-{k:'Thuê ngoài',h:'3PL = ĐỀ XUẤT cải cách + nhận TRỌN GÓI, không phải chỉ nhận chở thuê một khâu.',
- l:['3PL: đề xuất + trọn gói','物流子会社','二重派遣: cấm']},
-{k:'Giao chung',h:'Giao chung: xe ít hơn, đầy hơn, xanh hơn; đổi lại mất một phần linh hoạt.',
- l:['共同配送: 積載率↑・台数↓','拠点集約']},
-{k:'Ngoại thương',h:'FOB → CFR (+ cước, Freight) → CIF (+ bảo hiểm, Insurance): thêm mỗi chữ là người bán gánh thêm một phần. Rủi ro của người xuất tăng dần: trả trước < L/C < D/P < D/A < trả sau.',
- l:['Incoterms 2020: FOB・CFR・CIF','送金・L/C・D/P・D/A','D/P: trả tiền / D/A: nhận hối phiếu','B/L: 有価証券・裏書']},
-{k:'Thiết kế trung tâm',h:'4 câu hỏi thiết kế: Cái gì – Bao nhiêu – Khi nào – Như thế nào. Golden zone = tầm tay dễ lấy nhất. Ví dụ giao chung 3×3: 9 xe → 6 xe.',
- l:['荷姿・数量・時間・フロー','ゴールデンゾーン','人時生産性; lái chỉ ~54%','共同配送: 9台 → 6台','Incoterms đủ 11 quy tắc']}
+{k:'Mạng lưới',h:'Nhiều kho: giao rẻ, kho đắt',c:[
+ ['Cấu trúc',['ノード + リンク'],0],
+ ['Trade-off',['kho nhiều → giao ↓','kho, tồn ↑'],1],
+ ['Loại kho',['DC: giữ hàng','TC: trung chuyển','PC: gia công'],2],
+ ['Xu hướng',['配送型・đi thuê','lớn, ven cảng'],3],
+ ['重心法',['tấn-km nhỏ nhất'],4],
+ ['特積み',['600km → sáng mai','~1,000km → trong mai'],5]]},
+{k:'Theo ngành',h:'Sản xuất gom · Bán buôn gom-chia · Bán lẻ về trung tâm',c:[
+ ['メーカー',['gom tồn kho','hàng rẻ: SX gần'],0],
+ ['卸',['集荷分散'],1],
+ ['小売',['センター納品','一括物流'],2]]},
+{k:'Trong kho',h:'Nhận – Kiểm – Cất – Giữ – Lấy – Đóng – Chia – Xuất',c:[
+ ['Dòng hàng',['入荷 → 検品 → 格納','保管 → ピッキング','梱包 → 仕分け → 出荷'],0],
+ ['ロケーション',['固定','フリー: cần hệ thống'],1],
+ ['ABC tần suất',['xuất nhiều → gần cửa','tần suất ≠ lượng'],2],
+ ['ピッキング',['摘み取り: theo đơn','種まき: gom rồi chia'],3]]},
+{k:'Thuê ngoài',h:'3PL = đề xuất + trọn gói',c:[
+ ['3PL',['đề xuất cải cách','nhận trọn gói'],0],
+ ['物流子会社',['rõ chi phí','bài toán: 外販'],1],
+ ['派遣',['二重派遣: cấm'],2]]},
+{k:'Giao chung',h:'Ít xe hơn, đầy xe hơn',c:[
+ ['共同配送',['積載率↑','台数↓・xanh'],0],
+ ['Đổi lại',['bớt linh hoạt','chia phí khó'],0],
+ ['拠点集約',['diện tích ↓','横持ち ↓'],1]]},
+{k:'Ngoại thương',h:'FOB → +Freight (CFR) → +Insurance (CIF)',c:[
+ ['Incoterms',['FOB: lên tàu','CFR: + cước','CIF: + bảo hiểm'],0],
+ ['Rủi ro bên xuất',['前払 < L/C < D/P','< D/A < 後払'],1],
+ ['D/P・D/A',['D/P: trả tiền','D/A: nhận hối phiếu'],2],
+ ['B/L',['有価証券','指図式: 裏書'],3]]},
+{k:'Thiết kế',h:'Cái gì – Bao nhiêu – Khi nào – Thế nào',c:[
+ ['4 điều kiện',['荷姿・数量','時間・フロー'],0],
+ ['Vùng lấy hàng',['ゴールデンゾーン','ストライクゾーン'],1],
+ ['Năng suất',['人時生産性','lái chỉ ~54%'],2],
+ ['共同配送',['9台 → 6台','荷役 18 → 12'],3],
+ ['Incoterms',['đủ 11 quy tắc','DDP: bán lo cả thuế'],4]]}
 ]},
-6:{s:'Tồn kho là "tấm đệm": ít quá thì hết hàng, nhiều quá thì tốn tiền. Chương 6: vì sao cần → ghi chép ra sao → bao nhiêu là đủ (công thức) → bổ sung kiểu gì → phân tích → kiểm kê.',
+6:{s:'Tồn kho là tấm đệm: thiếu thì hết hàng, thừa thì tốn tiền.',
 b:[
-{k:'Mục đích',h:'Hai mục tiêu CÙNG LÚC: đủ hàng cho khách và không thừa. Tồn kho là TÀI SẢN (棚卸資産) trên bảng cân đối kế toán.',
- l:['2 mục đích đồng thời','棚卸資産 (流動資産)','サービス率 = 1 − 品切れ率','Lý do: ロット・変動・安定・見越し・LT']},
-{k:'Nhập – xuất',h:'Tồn hôm nay = tồn hôm qua + nhập − xuất. Thông tin phải khớp hiện vật (情物一致).',
- l:['当残 = 前残 + 入 − 出','ロケーション: cái gì, bao nhiêu, ở đâu']},
-{k:'Tồn kho an toàn',h:'Công thức "k – σ – căn t": 安全在庫 = k × σ × √t. Lấy k = 2 → khả năng hết hàng 2,28%. Lượng đặt tối ưu = √(2cD ÷ dp).',
- l:['Phân phối chuẩn μ, σ','安全在庫 = kσ√t','平均 = Q/2 + SS / 最大 = Q + SS','最適補充量 = √(2cD/dp)']},
-{k:'4 cách bổ sung',h:'Bảng 2×2: KỲ (定期 / 不定期) × LƯỢNG (定量 / 不定量). 定期定量 chỉ có trên lý thuyết; 発注点 = 不定期定量, hợp hàng C.',
- l:['定期定量: gần như không dùng','不定期定量: 発注点, hàng C','定期不定量: tính mỗi kỳ','不定期不定量: từng lần, khuyến mãi']},
-{k:'Phân tích',h:'Số ngày tồn và vòng quay là NGHỊCH ĐẢO của nhau. ABC: 70% – 90% – còn lại. Đường cong lũy kế nhập – xuất: khoảng cách DỌC giữa hai đường = lượng tồn, khoảng cách NGANG = số ngày tồn.',
- l:['保有日数 ⇄ 回転率','ABC: 70%・90%','流動数曲線: cách dọc = tồn, cách ngang = ngày','在庫鮮度']},
-{k:'Kiểm kê',h:'Sổ lệch với thực tế → sửa SỔ theo HÀNG THẬT rồi tìm nguyên nhân. 一斉 = dừng hết, chính xác, làm cuối kỳ; 循環 = luân phiên từng khu.',
- l:['帳簿 / 実地: sửa theo hiện vật','一斉棚卸: cuối kỳ','循環棚卸: luân phiên']},
-{k:'Ví dụ tính',h:'k = 1 – 2 – 3 → hết hàng 15,87% – 2,28% – 0,13%. Quy luật căn bậc hai: 9 kho gom còn 4 thì tồn kho còn √4/√9 = 2/3.',
- l:['SS ≈ 98, 発注点 ≈ 440…','k=1・2・3 → 15.87・2.28・0.13%','発注点 → 定期 → 連続補充 (VMI・CRP・CPFR)','平方根の法則: 9→4 = 2/3']}
+{k:'Mục đích',h:'Vừa đủ cho khách, vừa không thừa',c:[
+ ['2 mục đích',['đủ cho khách','bớt phí giữ'],0],
+ ['会計',['棚卸資産','流動資産'],1],
+ ['サービス率',['= 1 − 品切れ率'],2],
+ ['Vì sao có',['ロット・変動','安定・見越し・LT'],3]]},
+{k:'Nhập – xuất',h:'Hôm nay = hôm qua + nhập − xuất',c:[
+ ['当残',['前残 + 入 − 出'],0],
+ ['情物一致',['sổ khớp hàng'],0],
+ ['ロケーション',['cái gì・bao nhiêu・ở đâu'],1],
+ ['先入れ先出し',['nhập trước xuất trước'],1]]},
+{k:'Tồn an toàn',h:'k × σ × √t',c:[
+ ['Phân phối',['chuẩn μ, σ','μ+2σ: 2.28%'],0],
+ ['安全在庫',['k × σ × √t','thường k = 2'],1],
+ ['平均・最大',['Q/2 + SS','Q + SS'],2],
+ ['最適補充量',['√(2cD ÷ dp)'],3]]},
+{k:'Bổ sung',h:'Bảng 2×2: KỲ × LƯỢNG',c:[
+ ['定期定量',['chỉ có trên lý thuyết'],0],
+ ['不定期定量',['発注点方式','hàng C'],1],
+ ['定期不定量',['tính mỗi kỳ','tốn công'],2],
+ ['不定期不定量',['từng lần','khuyến mãi'],3]]},
+{k:'Phân tích',h:'Ngày tồn ⇄ vòng quay · ABC 70 – 90',c:[
+ ['日数・回転率',['nghịch đảo nhau'],0],
+ ['ABC',['A ≤70%','B ≤90%','C còn lại'],1],
+ ['流動数曲線',['cách dọc = tồn','cách ngang = ngày'],2],
+ ['在庫鮮度',['xếp theo ngày tồn'],3]]},
+{k:'Kiểm kê',h:'Lệch thì sửa SỔ theo HÀNG',c:[
+ ['帳簿・実地',['sửa theo hiện vật'],0],
+ ['一斉棚卸',['dừng hết','cuối kỳ'],1],
+ ['循環棚卸',['luân phiên','tuần, tháng'],2]]},
+{k:'Ví dụ tính',h:'k = 1 · 2 · 3 → 15.87 · 2.28 · 0.13%',c:[
+ ['Ví dụ',['SS ≈ 98','発注点 ≈ 440'],0],
+ ['k và rủi ro',['1: 15.87%','2: 2.28%','3: 0.13%'],1],
+ ['Tiến hóa',['発注点 → 定期','→ 連続補充'],2],
+ ['平方根',['9 → 4 kho','tồn còn 2/3'],3]]}
 ]},
-7:{s:'Chở hàng bằng gì → quản lý xe và tài xế ra sao → gói hàng thế nào → gom hàng thành đơn vị chuẩn (pallet, container) để bốc dỡ bằng máy.',
+7:{s:'Chở bằng gì, quản xe ra sao, gói thế nào, gom thành đơn vị.',
 b:[
-{k:'Phương thức vận tải',h:'Xe tải: tiện nhất (cửa đến cửa). Tàu hỏa: ít CO2 nhất. Tàu biển: rẻ nhất cho hàng nhiều, đi xa. Máy bay: nhanh nhất, đắt nhất. Mốc khoảng cách: 600 km và 1.000 km.',
- l:['6 tiêu chí so sánh','トラック: door-to-door, ~600km','鉄道 CO2 ít nhất / 船舶 rẻ nhất','航空: ベリー / フレーター']},
-{k:'Quản lý vận tải',h:'運行管理者 cho xe KINH DOANH (đến 29 xe: 1 người, thêm mỗi 30 xe); 安全運転管理者 cho xe TỰ DÙNG (từ 5 xe, hoặc từ 1 xe loại 11 chỗ trở lên).',
- l:['配車・運行・追跡','運行管理者: 29両まで1人','安全運転管理者: 5台以上 (11人乗り: 1台)','傭車']},
-{k:'Bao gói',h:'Mục đích số 1: BẢO VỆ hàng. 工業包装 để chở; 商業包装 để bán.',
- l:['目的: 保護','工業包装 / 商業包装','個装・内装・外装']},
-{k:'Unit load',h:'T11 = 1.100 × 1.100 mm. Container ISO 20/40 ft; 45 ft về nguyên tắc không chạy đường công cộng. JR: 12 ft (5 t) phổ biến, 31 ft ≈ một xe tải lớn.',
- l:['ユニットロード: cơ giới hóa','T11: 1,100×1,100','ISO 20・40ft; 45ft không chạy đường công cộng','JR 12ft (5t) / 31ft']},
-{k:'Pallet & container',h:'JR 12 ft: 5.000 kg; 31 ft: 13.800 kg. ISO 20–45 ft: tổng tối đa 36.000 kg.',
- l:['平パレット > 80%','JR12ft 5,000kg / 31ft 13,800kg','ISO 36,000kg; 10ft 10,160kg','Tank 30,000L, LD-3 1,587kg']}
+{k:'Phương thức',h:'Xe tải tiện · Tàu hỏa sạch · Tàu biển rẻ · Máy bay nhanh',c:[
+ ['Tiêu chí',['kinh tế・nhanh・đúng','an toàn・tiện・môi trường'],0],
+ ['トラック',['door-to-door','~600km'],1],
+ ['鉄道・船',['鉄道: CO2 ít nhất','船: rẻ nhất, chậm'],2],
+ ['航空',['nhanh, đắt','ベリー / フレーター'],3]]},
+{k:'Quản lý xe',h:'運行 cho xe kinh doanh · 安全運転 cho xe tự dùng',c:[
+ ['3 mảng',['配車・運行','貨物追跡'],0],
+ ['運行管理者',['xe kinh doanh','29両まで1人'],1],
+ ['安全運転管理者',['xe tự dùng ≥5台','11人乗り: 1台'],2],
+ ['傭車',['thuê xe hãng khác'],3]]},
+{k:'Bao gói',h:'Số 1 là BẢO VỆ hàng',c:[
+ ['Mục đích',['bảo vệ hàng'],0],
+ ['2 loại',['工業: để chở','商業: để bán'],1],
+ ['3 lớp',['個装・内装・外装'],2]]},
+{k:'Unit load',h:'T11 = 1,1 × 1,1 m',c:[
+ ['ユニットロード',['cơ giới hóa','một bộ suốt tuyến'],0],
+ ['T11',['1,100 × 1,100mm'],1],
+ ['ISO',['20・40ft','45ft: không đường thường'],2],
+ ['JR',['12ft (5t) chủ yếu','31ft ≈ xe lớn'],3]]},
+{k:'Pallet, container',h:'12ft: 5 tấn · ISO: 36 tấn',c:[
+ ['平パレット',['> 80%'],0],
+ ['JR',['12ft 5,000kg','31ft 13,800kg'],1],
+ ['ISO',['20–45ft 36,000kg','10ft 10,160kg'],2],
+ ['Khác',['Tank 30,000L','LD-3 1,587kg'],3]]}
 ]},
-8:{s:'Chi phí logistics như tảng băng: phần nổi là tiền trả cho bên ngoài, phần chìm nằm lẫn trong lương, khấu hao… Chương 8: nhìn thấy chi phí → tính đúng → giảm mà không làm hỏng dịch vụ.',
+8:{s:'Chi phí logistics như tảng băng: thấy được, tính đúng, giảm khéo.',
 b:[
-{k:'Cách nhìn chi phí',h:'Kế toán tài chính KHÔNG đủ → cần kế toán quản trị. 支払 (trả ngoài) dễ thấy, 自家 (tự làm) khó thấy. Vận tải chiếm hơn nửa tổng chi phí.',
- l:['Cần 管理会計','支払物流費 / 自家物流費','通産省方式: 機能・主体・変固','輸送費 > 50%','負担力: tỉ lệ thấp = chịu được']},
-{k:'Cước phí',h:'Cước xe tải: 認可 → 届出, báo SAU trong 30 ngày. Phí kho tính 3 kỳ/tháng (1–10, 11–20, 21–cuối tháng).',
- l:['運賃: 事後届出 (30日)','貸切・積合せ・宅配便','倉庫料金 = 保管料 + 荷役料','保管料: 3期制・従価+従量・級地']},
-{k:'Cách tính',h:'Khâu mua vào → 売上原価; khâu bán ra → 販管費. Lương phải cộng cả bảo hiểm, phúc lợi (khoảng 1,2 lần trở lên). Bao bì để BÁN không tính vào chi phí logistics.',
- l:['調達 → 売上原価 / 販売 → 販管費','人件費: cả phúc lợi','社内金利','消費者包装: không tính']},
-{k:'Đánh đổi & công cụ',h:'Người nhận hưởng, người gửi trả tiền → dịch vụ thừa → định giá theo menu. Đổi đơn vị: xe tải 1 m³ = 280 kg; máy bay 6.000 cm³ = 1 kg; tàu biển và kho 1 t = 1,133 m³.',
- l:['Trade-off các loại','予実・ベンチマーク・KPI・PDCA','独禁法・取適法','メニュープライシング','Rủi ro tồn cao → ít kho','Xe quay vòng nhiều → phí/chuyến ↓','容積換算: 280kg・6,000cm³・1t=1.133㎥']},
-{k:'Tảng băng & ABC',h:'Tảng băng: phần nổi = trả ngoài, phần chìm = ẩn trong giá vốn và 販管費. Chi phí ABC = số lần × thời gian × đơn giá hoạt động.',
- l:['氷山 (tảng băng)','窯業 9.29% / 電気 2.11%','ABC = 回数 × 時間 × 単価','保管料: 3 yếu tố','IT: giảm phí + tăng dịch vụ']}
+{k:'Cách nhìn',h:'Kế toán tài chính không đủ → kế toán quản trị',c:[
+ ['管理会計',['kế toán TC không đủ'],0],
+ ['2 loại phí',['支払: dễ thấy','自家: khó thấy'],1],
+ ['通産省方式',['機能・主体・変固'],2],
+ ['輸送費',['> 50% tổng'],3],
+ ['負担力',['tỉ lệ thấp = chịu được'],4]]},
+{k:'Cước phí',h:'Cước xe báo SAU 30 ngày · Kho 3 kỳ/tháng',c:[
+ ['運賃',['認可 → 届出','事後 30日'],0],
+ ['3 kiểu cước',['貸切・積合せ','宅配便 (≤30kg)'],1],
+ ['倉庫料金',['保管料 + 荷役料'],2],
+ ['保管料',['3期制','従価 + 従量・級地'],3]]},
+{k:'Cách tính',h:'Mua vào → 原価 · Bán ra → 販管費',c:[
+ ['Hạch toán',['調達 → 売上原価','販売 → 販管費'],0],
+ ['人件費',['+ phúc lợi','~1.2 lần lương'],1],
+ ['社内金利',['vốn nằm trong tồn kho'],2],
+ ['消費者包装',['không tính'],3]]},
+{k:'Đánh đổi',h:'Người nhận hưởng, người gửi trả → dịch vụ thừa',c:[
+ ['Trade-off',['dịch vụ ⇄ phí','vận chuyển ⇄ kho'],0],
+ ['Công cụ',['予実・KPI','ベンチマーク・PDCA'],1],
+ ['Luật',['独禁法','取適法'],2],
+ ['メニュー価格',['giảm giá theo mức'],3],
+ ['Giảm phí',['tồn rủi ro → ít kho','xe quay nhiều → rẻ'],4],
+ ['容積換算',['xe 1㎥ = 280kg','bay 6,000cm³ = 1kg','biển 1t = 1.133㎥'],6]]},
+{k:'Tảng băng, ABC',h:'ABC = số lần × thời gian × đơn giá',c:[
+ ['氷山',['nổi: trả ngoài','chìm: ẩn trong phí'],0],
+ ['Theo ngành',['窯業 9.29% cao','電気 2.11% thấp'],1],
+ ['ABC',['回数 × 時間 × 単価'],2],
+ ['保管料',['chỗ・thời gian・quản lý','荷役料 tính 2 lần'],3],
+ ['IT',['phí ↓ + dịch vụ ↑','không phải trade-off'],4]]}
 ]},
-9:{s:'Hệ thống thông tin logistics: định nghĩa → các lớp hệ thống → cách thiết kế → "con mắt" đọc dữ liệu: mã vạch, QR, RFID.',
+9:{s:'Hệ thống thông tin: định nghĩa, phân loại, thiết kế, mã vạch.',
 b:[
-{k:'Định nghĩa',h:'Mục đích: vận hành trơn tru (khách hài lòng + hiệu quả). Đặc trưng: nhiều cứ điểm, nhiều thiết bị, di động, kết nối giữa doanh nghiệp, phải bảo trì nhiều.',
- l:['JIS Z 0111','Mục đích: 顧客満足 + 効率化','5 đặc trưng']},
-{k:'Phân loại',h:'Ba nhóm: 基幹 (lõi) – 情報 – 業務; 業務 chia tiếp thành 計画 (dự báo, lập kế hoạch) và 実行 (đơn hàng, kho, xe).',
- l:['基幹・情報・業務','計画系: 需要予測…','実行系: 受注・発注・WMS・TMS']},
-{k:'Thiết kế',h:'Chiến lược → Kế hoạch → Thiết kế → Kiểm thử → Vận hành; hai bước đầu quyết định Q·C·D. Người dùng phải tham gia khi định nghĩa yêu cầu.',
- l:['5 bước','Thành công: mục đích, CIO, ICT, người dùng','ウォーターフォール / アジャイル']},
-{k:'Mã vạch 1D',h:'JAN 13 số (mã nước Nhật 45/49); ITF 14 số cho thùng; GS1-128 có AI chứa ngày, số lô. Ưu: nhanh, ít đọc sai, rẻ. Nhược: ít thông tin, chiếm chỗ.',
- l:['Ưu: nhanh, ít sai, rẻ / Nhược: ít tin','JAN 13・8桁; 45・49','ITF 14桁 (thùng)','GS1-128: AI']},
-{k:'Mã 2D & RFID',h:'QR: nhiều thông tin, có sửa lỗi. RFID: sóng điện, không cần chạm, đọc nhiều thẻ cùng lúc, ghi lại được; sợ kim loại và chất lỏng.',
- l:['QR: nhiều tin, 誤り訂正','RFID: 非接触・一括・書換']},
-{k:'Tính mã vạch',h:'Chữ số kiểm tra JAN-13: với 12 số đầu, đếm từ TRÁI, (tổng các vị trí chẵn × 3) + tổng các vị trí lẻ → lấy 10 trừ chữ số hàng đơn vị (nếu hàng đơn vị là 0 thì CD = 0). AI: 01 GTIN, 10 lô, 11 ngày sản xuất, 17 hạn sử dụng.',
- l:['CD (JAN-13, đếm từ trái): 偶数 × 3 + 奇数','AI 01・10・11・15・17・21','UPC (Mỹ) / QR (Nhật)']}
+{k:'Định nghĩa',h:'Mục đích: khách hài lòng + hiệu quả',c:[
+ ['JIS Z 0111',['định nghĩa chuẩn'],0],
+ ['Mục đích',['顧客満足','効率化'],1],
+ ['Đặc trưng',['nhiều cứ điểm, thiết bị','liên DN, sửa nhiều'],2]]},
+{k:'Phân loại',h:'Lõi – Thông tin – Nghiệp vụ (kế hoạch / thực hiện)',c:[
+ ['3 nhóm',['基幹・情報・業務'],0],
+ ['計画系',['dự báo nhu cầu','kế hoạch SX, bán'],1],
+ ['実行系',['受注・発注','WMS・TMS'],2]]},
+{k:'Thiết kế',h:'Hai bước đầu quyết định Q·C·D',c:[
+ ['5 bước',['戦略 → 企画 → 設計','テスト → 運用'],0],
+ ['Thành công',['mục đích rõ, CIO','người dùng tham gia'],1],
+ ['Cách làm',['ウォーターフォール','アジャイル'],2]]},
+{k:'Mã vạch 1D',h:'JAN 13 · ITF 14 · GS1-128 có AI',c:[
+ ['Ưu・nhược',['nhanh, ít sai, rẻ','ít tin, chiếm chỗ'],0],
+ ['JAN',['13・8 số','Nhật: 45・49'],1],
+ ['ITF',['14 số','cho thùng'],2],
+ ['GS1-128',['AI: ngày, lô'],3]]},
+{k:'Mã 2D, RFID',h:'QR nhiều tin · RFID không chạm',c:[
+ ['QR',['nhiều tin, nhỏ','誤り訂正'],0],
+ ['RFID',['sóng, không chạm','đọc nhiều một lúc','ghi lại được'],1],
+ ['RFID khó',['giá','kim loại, nước'],1]]},
+{k:'Tính mã vạch',h:'Chẵn × 3 + Lẻ → lấy 10 trừ hàng đơn vị',c:[
+ ['Check digit',['JAN-13, đếm từ trái','chẵn×3 + lẻ','10 − đơn vị (0 → 0)'],0],
+ ['AI',['01 GTIN・10 lô','11 ngày SX・17 hạn'],1],
+ ['Nguồn gốc',['UPC: Mỹ','QR: Nhật'],2]]}
 ]},
-10:{s:'Đi theo một đơn hàng: nhận đơn → đặt hàng với nhà cung cấp → kho (WMS) → giao hàng (TMS) → so sánh WMS với hệ thống lõi.',
+10:{s:'Theo một đơn hàng: nhận đơn → đặt hàng → kho → giao.',
 b:[
-{k:'Nhận đơn',h:'Nhận đơn → giữ hàng trong kho (引当) → có hàng thì ra lệnh xuất, không có thì vào danh sách chờ (受注残).',
- l:['エントリー・出荷情報・オーダー管理','Nhập đơn: màn hình・OCR・EOS','在庫引当 → 出荷 / 受注残','出荷・ピッキング・検品指示']},
-{k:'Đặt hàng',h:'Ai quyết định đặt hàng? Bên đặt (EOS, CAO), bên nhận (VMI), hoặc hai bên cùng làm. ASN = báo trước để kiểm nhận nhanh.',
- l:['EOS','発注側・受注側 (VMI)・協働','ASN']},
-{k:'WMS',h:'WMS = sổ nhập xuất + lấy/chia hàng + quản lý công việc (LMS).',
- l:['受け払い・ピッキング/仕分け・作業管理','検品: リスト・バーコード・自動','指示: リスト・シール・データ','LMS']},
-{k:'TMS',h:'TMS = điều xe + quản lý vận hành + theo dõi hàng. Tracking = ghi nhận theo từng trạm; Tracing = liên tục, thời gian thực.',
- l:['配車・運行・追跡','配車計画: xe đầy, đường ngắn','求車求荷','車載端末・デジタコ・GPS','トラッキング / トレーシング']},
-{k:'WMS và hệ thống lõi',h:'Hệ thống lõi lo TIỀN (giá, công nợ), cập nhật theo ngày; WMS lo HÀNG (vị trí, lô), cập nhật tức thì.',
- l:['基幹: tiền, theo ngày / WMS: hàng, tức thì','WMS = 3 phần']}
+{k:'Nhận đơn',h:'Nhận → giữ hàng → xuất, hoặc chờ',c:[
+ ['3 phần',['エントリー・出荷情報','オーダー管理'],0],
+ ['Nhập đơn',['màn hình・OCR','EOS'],1],
+ ['在庫引当',['có → xuất','không → 受注残'],2],
+ ['Chỉ thị',['出荷・ピッキング・検品'],3]]},
+{k:'Đặt hàng',h:'Ai đặt? Bên mua, bên bán (VMI) hay cùng nhau',c:[
+ ['EOS',['đặt hàng online','bớt công, bớt sai'],0],
+ ['Ai quyết',['発注側: EOS・CAO','受注側: VMI','協働'],1],
+ ['ASN',['báo trước khi giao'],2]]},
+{k:'WMS',h:'Sổ – Lấy/Chia – Quản việc',c:[
+ ['3 phần',['受け払い','ピッキング・仕分け','作業管理'],0],
+ ['入庫検品',['リスト・バーコード','自動'],1],
+ ['Chỉ thị lấy',['リスト・シール','データ (digital)'],2],
+ ['LMS',['tiến độ, năng suất'],3]]},
+{k:'TMS',h:'Điều xe – Chạy xe – Theo dõi',c:[
+ ['3 phần',['配車・運行','追跡'],0],
+ ['配車計画',['xe đầy','đường ngắn'],1],
+ ['求車求荷',['khớp xe trống – hàng'],2],
+ ['運行管理',['車載端末・デジタコ','GPS'],3],
+ ['Theo dõi',['トラッキング: theo trạm','トレーシング: liên tục'],4]]},
+{k:'WMS và lõi',h:'Lõi lo TIỀN · WMS lo HÀNG',c:[
+ ['基幹',['giá, công nợ','cập nhật theo ngày'],0],
+ ['WMS',['vị trí, lô','cập nhật tức thì'],0],
+ ['WMS gồm',['受け払い + ピッキング','+ 作業管理'],1]]}
 ]}
 };

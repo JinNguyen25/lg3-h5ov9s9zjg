@@ -1,5 +1,5 @@
 /* Lưu sẵn để mở được khi không có mạng. Đổi VERSION mỗi lần cập nhật nội dung. */
-const VERSION='logi3-2026-11-16h';
+const VERSION='logi3-2026-11-16i';
 const FILES=['./','index.html','app.css','app.js','data/content.js','data/extra2.js','data/extra3.js','data/mindmap.js','data/qbranch.js','data/mock.js','data/mock-notes.js','manifest.webmanifest','icon.svg','icon-180.png','icon-192.png','icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==VERSION).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

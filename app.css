@@ -177,3 +177,21 @@ details.hook summary{cursor:pointer;list-style:none}details.hook summary b{displ
 .brres{gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}.brres:last-of-type{border-bottom:0}
 .pct.no{color:var(--bad)}
 .qbr{font-size:12px;color:var(--mute);margin-top:8px}
+
+/* Cây mind map trong từng nhánh */
+.hookline{margin:8px 0 4px;font-size:14px;line-height:1.45}
+.hookline span{display:inline-block;font-size:11px;font-weight:700;color:var(--warn);background:var(--warn-bg);border-radius:99px;padding:1px 8px;margin-right:6px}
+.tree{position:relative;display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:22px;padding:10px 0 4px}
+.tlinks{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.tlinks path{fill:none;stroke:var(--c);stroke-linecap:round;opacity:.8}
+.t-root{background:var(--c);color:var(--card);font:700 13px/1.25 var(--ui);border-radius:12px;padding:8px 10px;max-width:84px;text-align:center;position:relative;z-index:1}
+.t-kids{display:flex;flex-direction:column;gap:12px;min-width:0}
+.t-row{display:grid;grid-template-columns:minmax(64px,max-content) 1fr;column-gap:22px;align-items:center;position:relative;z-index:1}
+.t-sub{border:2px solid var(--c);background:var(--card);color:var(--ink);border-radius:10px;padding:5px 9px;font:700 13px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;cursor:pointer;text-align:left;max-width:118px;min-height:36px}
+.t-sub.open{background:var(--c);color:var(--card)}
+.t-leaves{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}
+.t-leaf{font:500 13px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Hiragino Sans","Yu Gothic UI","Noto Sans JP",sans-serif;padding:2px 2px 3px;border-bottom:2px solid var(--c);color:var(--ink);max-width:100%}
+button.t-leaf.hid{background:var(--line);border:0;border-bottom:2px dashed var(--c);border-radius:6px 6px 0 0;min-width:72px;min-height:28px;color:var(--mute);cursor:pointer;font-weight:700}
+.t-detail{grid-column:1 / -1;margin-top:6px;background:var(--bg);border:1px solid var(--line);border-left:3px solid var(--c);border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.5}
+.t-detail .j{font-family:var(--jp)}.t-detail .v{color:var(--mute);margin-top:3px}
+@media (max-width:420px){.tree{column-gap:14px}.t-row{column-gap:14px}.t-root{max-width:70px;font-size:12px;padding:6px 7px}.t-sub{max-width:100px;font-size:12px}.t-leaf{font-size:12.5px}}
