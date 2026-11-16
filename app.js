@@ -172,10 +172,10 @@ function mindmap(n,cards){
     h+='<div class="tree" data-tree="'+i+'"><svg class="tlinks" aria-hidden="true"></svg><div class="t-root" lang="ja">'+esc(b.k)+'</div><div class="t-kids">';
     b.c.forEach(function(ch,j){
       var k=n+'-'+i+'-'+j, o=OPEN[k], pt=cd[2][ch[2]]||['',''], lx=((window.LECTURE||{})[n]||[])[i], ex=(lx&&lx[1][ch[2]])||pt[1];
-      h+='<div class="t-row"><button class="t-sub'+(o?' open':'')+'" data-sub="'+k+'" aria-expanded="'+(o?'true':'false')+'" lang="ja">'+esc(ch[0])+'</button><div class="t-leaves">';
+      h+='<div class="t-row"><button class="t-sub'+(o?' open':'')+'" data-sub="'+k+'" aria-expanded="'+(o?'true':'false')+'" aria-controls="td'+k+'" lang="ja">'+esc(ch[0])+'</button><div class="t-leaves">';
       ch[1].forEach(function(f,m){var rk=k+'-'+m, hid=rc&&!REV[rk];
         h+=hid?'<button class="t-leaf hid" data-lf="'+rk+'" aria-label="Chạm để xem">?</button>':'<span class="t-leaf" lang="ja">'+esc(f)+'</span>'});
-      h+='</div>'+(o?'<div class="t-detail"><div class="j" lang="ja">'+gl(esc(pt[0]))+'</div>'+(ex?'<div class="v">'+gl(esc(ex))+'</div>':'')+'</div>':'')+'</div>';
+      h+='</div><div class="t-detail" id="td'+k+'"'+(o?'':' hidden')+'><div class="j" lang="ja">'+gl(esc(pt[0]))+'</div>'+(ex?'<div class="v">'+gl(esc(ex))+'</div>':'')+'</div></div>';
     });
     h+='</div></div>';
     var nq=chQ(n).filter(function(q){return q.br===i}).length;
@@ -185,6 +185,17 @@ function mindmap(n,cards){
   return h+'</div>';
 }
 
+
+/* cuộn vừa đủ để cả khối (ô + phần giải thích) nằm trọn trong vùng nhìn thấy, không bị thanh trên hay thanh tab dưới che */
+function fitView(el){
+  var r=el.getBoundingClientRect(), bar=$('.bar'), tabs=$('.tabs');
+  var top=(bar?bar.getBoundingClientRect().bottom:0)+8, bottom=innerHeight-8;
+  if(tabs){var tr=tabs.getBoundingClientRect();if(tr.width>tr.height&&tr.top>innerHeight/2)bottom=tr.top-8}
+  var dy=0;
+  if(r.bottom>bottom) dy=Math.min(r.bottom-bottom,r.top-top);   /* khối quá cao thì ưu tiên giữ đầu khối */
+  else if(r.top<top) dy=r.top-top;
+  if(Math.abs(dy)>2) window.scrollBy({top:dy,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+}
 /* vẽ đường cong nối các nút của cây (gọi sau mỗi lần dựng trang và khi đổi kích thước) */
 function drawTrees(){
   document.querySelectorAll('.tree').forEach(function(t){
@@ -234,11 +245,18 @@ function chapter(n,fb){
       var t=e.target.closest('[data-m]'); if(t){chapter.m=t.dataset.m;chapter(n);return}
       t=e.target.closest('[data-brq]'); if(t){var bi=+t.dataset.brq;startPractice(shuffle(qs.filter(function(q){return q.br===bi})),'Nhánh '+(bi+1)+': '+brName(n,bi),'#learn/'+n+'/'+bi);return}
       t=e.target.closest('[data-sub]'); if(t){var k=t.dataset.sub;
-        /* chỉ mở một ô mỗi lúc: mở ô mới thì ô đang mở tự đóng lại */
-        if(S.set.recall&&app.querySelector('[data-lf^="'+k+'-"]')){t.closest('.t-row').querySelectorAll('[data-lf]').forEach(function(x){REV[x.dataset.lf]=1})} else {var wasOpen=OPEN[k];OPEN={};if(!wasOpen)OPEN[k]=1}
-        /* giữ ô vừa chạm đứng yên trên màn hình, kể cả khi ô phía trên vừa đóng lại */
-        var top0=t.getBoundingClientRect().top;chapter(n);var f=app.querySelector('[data-sub="'+k+'"]');
-        if(f){window.scrollBy(0,f.getBoundingClientRect().top-top0);f.focus({preventScroll:true})}return}
+        /* chế độ tự nhớ lại: lần chạm đầu lật hết các ý của nút con */
+        if(S.set.recall&&app.querySelector('[data-lf^="'+k+'-"]')){t.closest('.t-row').querySelectorAll('[data-lf]').forEach(function(x){REV[x.dataset.lf]=1});var top1=t.getBoundingClientRect().top;chapter(n);var f1=app.querySelector('[data-sub="'+k+'"]');if(f1)window.scrollBy(0,f1.getBoundingClientRect().top-top1);return}
+        /* chỉ mở một ô mỗi lúc, bật/tắt tại chỗ (không vẽ lại cả trang) */
+        var row=t.closest('.t-row'), d=row.querySelector('.t-detail'), opening=d.hidden, top0=t.getBoundingClientRect().top;
+        app.querySelectorAll('.t-detail:not([hidden])').forEach(function(x){x.hidden=true});
+        app.querySelectorAll('.t-sub.open').forEach(function(x){x.classList.remove('open');x.setAttribute('aria-expanded','false')});
+        OPEN={};
+        if(opening){d.hidden=false;t.classList.add('open');t.setAttribute('aria-expanded','true');OPEN[k]=1}
+        window.scrollBy(0,t.getBoundingClientRect().top-top0);   /* ô phía trên vừa đóng thì bù lại, để ô vừa chạm đứng yên */
+        drawTrees();
+        if(opening) fitView(row);
+        return}
       t=e.target.closest('[data-lf]'); if(t){REV[t.dataset.lf]=1;var y3=window.scrollY;chapter(n);window.scrollTo(0,y3);return}
       t=e.target.closest('[data-go-b]'); if(t){var el=document.getElementById('br'+t.dataset.goB);if(el)el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});return}
       t=e.target.closest('[data-mm]'); if(t){var i=+t.dataset.mm,ok=t.dataset.v==='1';brMark(n+'-'+i,ok);if(ok)S.read[n+'-'+i]=1;else delete S.read[n+'-'+i];save();

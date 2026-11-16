@@ -228,3 +228,5 @@ button.t-leaf.hid{background:var(--line);border:0;border-bottom:2px dashed var(-
 .lec p.vi2{color:var(--mute);font-size:14.5px;margin-top:4px}
 .lec-p{margin:8px 0 0;line-height:1.75;font-size:15.5px}
 .lec-tip div{margin-bottom:2px}
+
+.t-detail[hidden]{display:none}

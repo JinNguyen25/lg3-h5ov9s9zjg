@@ -1,6 +1,6 @@
 /* Lưu sẵn để mở được khi không có mạng. Đổi VERSION mỗi lần cập nhật nội dung
    (app đọc VERSION này để biết có bản mới và hiện nút "Cập nhật"). */
-const VERSION='logi3-20261116-1601';
+const VERSION='logi3-20261116-1610';
 const FILES=['./','index.html','app.css','app.js','data/content.js','data/extra2.js','data/extra3.js','data/mindmap.js','data/lecture.js','data/lecture2.js','data/lecture_ja.js','data/lecture_ja2.js','data/glossary.js','data/qbranch.js','data/mock.js','data/mock-notes.js','manifest.webmanifest','icon.svg','icon-180.png','icon-192.png','icon-512.png'];
 /* cache:'reload' để bản cài mới không lấy nhầm file cũ từ bộ nhớ đệm HTTP của trình duyệt */
 self.addEventListener('install',e=>{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(FILES.map(f=>new Request(f,{cache:'reload'})))).then(()=>self.skipWaiting()))});
